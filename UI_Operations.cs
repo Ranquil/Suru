@@ -66,6 +66,8 @@ public class UI_Operations : MonoBehaviour {
                     
                     buttons[1].GetComponent<SpriteRenderer>().sprite = null;
                     Buttons_box[1].enabled = false;
+                    buttons[2].GetComponent<SpriteRenderer>().sprite = null;
+                    Buttons_box[2].enabled = false;
 
 
                     buttons[0].GetComponent<SpriteRenderer>().sprite = Sprites[0];
@@ -78,13 +80,20 @@ public class UI_Operations : MonoBehaviour {
                 }
                 if(Physics2D.GetRayIntersection(mouseRay, 100f) == Buttons_box[2])
                 {
+                    buttons[1].GetComponent<SpriteRenderer>().sprite = null;
+                    Buttons_box[1].enabled = false;
+                    buttons[2].GetComponent<SpriteRenderer>().sprite = null;
+                    Buttons_box[2].enabled = false;
+
                     buttons[0].GetComponent<SpriteRenderer>().sprite = Sprites[0];
                     Levels[0].GetComponent<MoveLevel>().enabled = false;
                     Levels[0].GetComponent<Platforms>().enabled = false;
                     Buttons_box[0].enabled = true;
+                   
+                    Application.Quit();
 
-                    menuPressed = false;
-                    BackPressed = true;
+                    
+                   
                 }
             }
         }

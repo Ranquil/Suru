@@ -28,7 +28,7 @@ public class Player : MonoBehaviour {
         }
         if (falling == true)
         {
-            player.GetComponent<Rigidbody2D>().mass = 1;
+            player.GetComponent<Rigidbody2D>().mass = 5;
         }
         else if(falling == false)
         {
