@@ -22,35 +22,43 @@ public class Player : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if( (player.transform.position.x > maincamera.rect.xMax || player.transform.position.x < maincamera.rect.xMin-10 || player.transform.position.y < -maincamera.rect.yMax-10))
+       
+        if (jump == true)
         {
-            player.transform.position = new Vector3(maincamera.rect.center.x,maincamera.rect.center.y,player.transform.position.z);
+            for (float i = 0; i < jumpheight; i = i + 1f)
+            {
+                player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, jumpheight);
+            }
+            jump = false;
         }
+    }
+    void FixedUpdate()
+    {
+        if ((player.transform.position.x > maincamera.rect.xMax || player.transform.position.x < maincamera.rect.xMin - 10 || player.transform.position.y < -maincamera.rect.yMax - 10))
+        {
+            player.transform.position = new Vector3(maincamera.rect.center.x, maincamera.rect.center.y, player.transform.position.z);
+        }
+        
         if (falling == true)
         {
-            player.GetComponent<Rigidbody2D>().mass = 5;
+            player.GetComponent<Rigidbody2D>().mass = 10;
         }
-        else if(falling == false)
+       
+        else if (falling == false)
         {
             player.GetComponent<Rigidbody2D>().mass = 0;
         }
-        if (falling == false)
+        if (Input.GetButtonDown("Jump"))
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (falling == false)
             {
                 jump = true;
+            }
 
-            }
-            if (jump == true)
-            {
-                for (float i = 0; i < jumpheight; i = i + 1f)
-                {
-                    player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, jumpheight);
-                }
-                jump = false;
-            }
+
         }
-	}
+
+    }
     void OnCollisionEnter2D(Collision2D col)
     {
         if(col.gameObject.tag.Equals("Platform"))

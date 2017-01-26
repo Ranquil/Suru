@@ -6,6 +6,7 @@ public class Platforms : MonoBehaviour {
 
     public GameObject[] alustat;
     GameObject[] platforms;
+    GameObject Spawner;
     public float moveSpeed;
     float StartingPoint;
     public Camera maincam;
@@ -18,6 +19,8 @@ public class Platforms : MonoBehaviour {
     int movingplatform4 = 0;
     int movingplatform5 = 0;
     GameObject[] usedPlatform;
+    bool spawn = false;
+ 
 
 
 
@@ -26,8 +29,15 @@ public class Platforms : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-
+        
+        Spawner = new GameObject();
+        Spawner.AddComponent<BoxCollider2D>();
+        Spawner.AddComponent<Rigidbody2D>().isKinematic = true;
+        Spawner.transform.position = new Vector3(20,0,0);
+        Spawner.GetComponent<BoxCollider2D>().size = new Vector2(20,20);
+        Spawner.gameObject.name = "Spawner";
         Cam = maincam.GetComponent<Camera>();
+        
         platforms = new GameObject[alustat.Length];
         platforms[0] = Instantiate(alustat[0] , alustat[0].transform.position, Quaternion.identity) as GameObject;
         platforms[1] = Instantiate(alustat[1] , alustat[1].transform.position, Quaternion.identity) as GameObject;
@@ -57,7 +67,7 @@ public class Platforms : MonoBehaviour {
 
         for(int i = 0; i < platforms.Length; i++)
         {
-            
+                platforms[i].AddComponent<Rigidbody2D>().isKinematic = true;
 
                 if(i == 0 || i == 1)
                 {
@@ -210,7 +220,7 @@ public class Platforms : MonoBehaviour {
                 Colliders[1].offset = new Vector2(0, -8.5f);
             }
 
-
+           
 
         }
 
@@ -261,30 +271,36 @@ public class Platforms : MonoBehaviour {
         usedPlatform[20] = platforms[1];
         usedPlatform[21] = platforms[1];
         usedPlatform[22] = platforms[1];
-        
-        
 
+        usedPlatform[1] = Instantiate(platforms[2]);
+        usedPlatform[2] = Instantiate(platforms[0]);
+        usedPlatform[3] = Instantiate(platforms[4]);
+        movingplatform = 1;
         StartingPoint = platforms[0].transform.position.x;
     }
     void instatePlatforms(int TheRand, int rand, int rand1, int rand2)
     {
         
-        if (timer == (1f/60f) && (movingplatform == 0 || movingplatform1 == 0 || movingplatform2 == 0 || movingplatform3 ==0 || movingplatform4 ==0 || movingplatform5 ==0))
+        if (spawn == true)
         {
             int add = 0;
             int add1 = 0;
             int add2 = 0;
             //  int[] addative = { 4, 5, 7, 8, 13, 14, 16, 17 };
 
-            if (TheRand == 1)
+            if (TheRand == 1 && movingplatform == 0)
             {
-                usedPlatform[1] = platforms[rand];
-                usedPlatform[2] = platforms[rand1];
-                usedPlatform[3] = platforms[rand2];
+                usedPlatform[1] = Instantiate(platforms[rand]);
+                usedPlatform[2] = Instantiate(platforms[rand1]);
+                usedPlatform[3] = Instantiate(platforms[rand2]);
                 chosenPlatforms = TheRand;
                 movingplatform = 1;
             }
-            if (TheRand == 2)
+            else if(TheRand == 1)
+            {
+                TheRand++;
+            }
+            if (TheRand == 2 && movingplatform1 == 0)
             {
 
                 if (rand == 2)
@@ -313,13 +329,21 @@ public class Platforms : MonoBehaviour {
                 }
 
 
-                usedPlatform[4] = platforms[rand + add];
-                usedPlatform[5] = platforms[rand1 + add1];
-                usedPlatform[6] = platforms[rand2 + add2];
+                usedPlatform[4] = Instantiate(platforms[rand + add]);
+                usedPlatform[5] = Instantiate(platforms[rand1 + add1]);
+                usedPlatform[6] = Instantiate(platforms[rand2 + add2]);
+              /*  usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x + 20, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
+                usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x + 20, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
+                usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x + 20, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);*/
                 chosenPlatforms = TheRand;
                 movingplatform1 = 1;
+               
             }
-            if (TheRand == 3)
+            else if(TheRand == 2)
+            {
+                TheRand++;
+            }
+            if (TheRand == 3 && movingplatform2 == 0)
             {
                 if (rand == 2)
                 {
@@ -346,13 +370,20 @@ public class Platforms : MonoBehaviour {
                     add2 = 8;
                 }
 
-                usedPlatform[7] = platforms[rand + add];
-                usedPlatform[8] = platforms[rand1 + add1];
-                usedPlatform[9] = platforms[rand2 + add2];
+                usedPlatform[7] = Instantiate(platforms[rand + add]);
+                usedPlatform[8] = Instantiate(platforms[rand1 + add1]);
+                usedPlatform[9] = Instantiate(platforms[rand2 + add2]);
+              /*  usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x + 40, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
+                usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x + 40, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
+                usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x + 40, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);*/
                 chosenPlatforms = TheRand;
                 movingplatform2 = 1;
             }
-            if (TheRand == 4)
+            else if(TheRand == 3)
+            {
+                TheRand++;
+            }
+            if (TheRand == 4 && movingplatform3 == 0)
             {
                 if (rand == 2)
                 {
@@ -378,11 +409,18 @@ public class Platforms : MonoBehaviour {
                 {
                     add2 = 17;
                 }
-                usedPlatform[10] = platforms[rand + add];
-                usedPlatform[11] = platforms[rand1 + add1];
-                usedPlatform[12] = platforms[rand2 + add2];
+                usedPlatform[10] = Instantiate(platforms[rand + add]);
+                usedPlatform[11] = Instantiate(platforms[rand1 + add1]);
+                usedPlatform[12] = Instantiate(platforms[rand2 + add2]);
+                /*usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x + 60, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
+                usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x + 60, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
+                usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x + 60, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);*/
                 chosenPlatforms = TheRand;
                 movingplatform3 = 1;
+            }
+            else if(TheRand == 4)
+            {
+                TheRand = 1;
             }
            /* if (TheRand == 5)
             {
@@ -449,7 +487,7 @@ public class Platforms : MonoBehaviour {
                 movingplatform5 = 1;
             }*/
         }
-        else if (timer > 0.75f)
+        else if (timer > 1.5f)
         {
             timer = 0;
         }
@@ -462,12 +500,17 @@ public class Platforms : MonoBehaviour {
     {
 
         instatePlatforms(Random.Range(1, 4), Random.Range(2, 3), Random.Range(0, 1), Random.Range(4, 5));
-
+        
         
 
        // destroyPlatforms();
-        timer = timer + (1f / 60f);
+       
 
+    }
+
+    void FixedUpdate()
+    {
+        timer = timer + (1f / 60f);
     }
 
     void movePlatforms(int choosedPlatforms)
@@ -497,119 +540,140 @@ public class Platforms : MonoBehaviour {
         platforms[21].transform.position = new Vector3(platforms[21].transform.position.x - moveSpeed, platforms[21].transform.position.y, platforms[21].transform.position.z);
         platforms[22].transform.position = new Vector3(platforms[22].transform.position.x - moveSpeed, platforms[22].transform.position.y, platforms[22].transform.position.z);
         */
-        if ( movingplatform == 1)
+        if (movingplatform == 1)
         {
             usedPlatform[1].transform.position = new Vector3(usedPlatform[1].transform.position.x - moveSpeed, usedPlatform[1].transform.position.y, usedPlatform[1].transform.position.z);
             usedPlatform[2].transform.position = new Vector3(usedPlatform[2].transform.position.x - moveSpeed, usedPlatform[2].transform.position.y, usedPlatform[2].transform.position.z);
             usedPlatform[3].transform.position = new Vector3(usedPlatform[3].transform.position.x - moveSpeed, usedPlatform[3].transform.position.y, usedPlatform[3].transform.position.z);
-            for (int i = 1; i < 4; i++)
+            /* for (int i = 1; i < 4; i++)
+             {
+                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                 {
+                     Debug.Log("Tänne päästiin");
+                     //usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                     Destroy(usedPlatform[i]);
+
+                 }*/
+            if (usedPlatform[3].transform.position.x + 2.5 < Cam.transform.position.x - 10)
             {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
-                {
-                    Debug.Log("Tänne päästiin");
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    
-                }
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 3)
-                {
-                    movingplatform = 0;
-                }
+                Destroy(usedPlatform[1].gameObject);
+                Destroy(usedPlatform[2].gameObject);
+                Destroy(usedPlatform[3].gameObject);
+                movingplatform = 0;
             }
+        //}
+
+
         }
         if ( movingplatform1 == 1)
         {
             usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x - moveSpeed, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
             usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x - moveSpeed, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
             usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x - moveSpeed, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);
-            for (int i = 4; i < 7; i++)
+          /*  for (int i = 4; i < 7; i++)
             {
                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
                 {
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    
-                }
-                if(usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 6)
+                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                    Destroy(usedPlatform[i]);
+                }*/
+                if (usedPlatform[6].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
+                    Destroy(usedPlatform[4].gameObject);
+                    Destroy(usedPlatform[5].gameObject);
+                    Destroy(usedPlatform[6].gameObject);
+                    Debug.Log("Moving Platform päästiin.");
                     movingplatform1 = 0;
                 }
-            }
+            //}
         }
         if ( movingplatform2 == 1)
         {
             usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x - moveSpeed, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
             usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x - moveSpeed, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
             usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x - moveSpeed, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);
-            for (int i = 7; i < 10; i++)
+           /* for (int i = 7; i < 10; i++)
             {
                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
                 {
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                
-                }
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 9)
+                    //  usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                    Destroy(usedPlatform[i]);
+                }*/
+                if (usedPlatform[9].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
+                    Destroy(usedPlatform[7].gameObject);
+                    Destroy(usedPlatform[8].gameObject);
+                    Destroy(usedPlatform[9].gameObject);
                     movingplatform2 = 0;
                 }
-            }
+            //}
         }
         if ( movingplatform3 == 1)
         {
             usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x - moveSpeed, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
             usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x - moveSpeed, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
             usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x - moveSpeed, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);
-            for (int i = 10; i < 13; i++)
+           /* for (int i = 10; i < 13; i++)
             {
                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
                 {
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    
-                }
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 12)
+                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                    Destroy(usedPlatform[i]);
+                }*/
+                if (usedPlatform[12].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
+                    Destroy(usedPlatform[10].gameObject);
+                    Destroy(usedPlatform[11].gameObject);
+                    Destroy(usedPlatform[12].gameObject);
                     movingplatform3 = 0;
                 }
-            }
+            //}
         }
         if ( movingplatform4 ==1)
         {
             usedPlatform[13].transform.position = new Vector3(usedPlatform[13].transform.position.x - moveSpeed, usedPlatform[13].transform.position.y, usedPlatform[13].transform.position.z);
             usedPlatform[14].transform.position = new Vector3(usedPlatform[14].transform.position.x - moveSpeed, usedPlatform[14].transform.position.y, usedPlatform[14].transform.position.z);
             usedPlatform[15].transform.position = new Vector3(usedPlatform[15].transform.position.x - moveSpeed, usedPlatform[15].transform.position.y, usedPlatform[15].transform.position.z);
-            for (int i = 13; i < 16; i++)
+            /*for (int i = 13; i < 16; i++)
             {
                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
                 {
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                  
-                }
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 15)
-                {
-                    movingplatform4 = 0;
+                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                    Destroy(usedPlatform[i]);
+                }*/
+            if (usedPlatform[15].transform.position.x + 2.5 < Cam.transform.position.x - 10)
+            {
+                Destroy(usedPlatform[13].gameObject);
+                Destroy(usedPlatform[14].gameObject);
+                Destroy(usedPlatform[15].gameObject);
+                movingplatform4 = 0;
                 }
 
-            }
+            //}
         }
         if ( movingplatform5 ==1)
         {
             usedPlatform[16].transform.position = new Vector3(usedPlatform[16].transform.position.x - moveSpeed, usedPlatform[16].transform.position.y, usedPlatform[16].transform.position.z);
             usedPlatform[17].transform.position = new Vector3(usedPlatform[17].transform.position.x - moveSpeed, usedPlatform[17].transform.position.y, usedPlatform[17].transform.position.z);
             usedPlatform[18].transform.position = new Vector3(usedPlatform[18].transform.position.x - moveSpeed, usedPlatform[18].transform.position.y, usedPlatform[18].transform.position.z);
-            for (int i = 16; i < 19; i++)
+            /*for (int i = 16; i < 19; i++)
             {
                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
                 {
-                    usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                   
-                }
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin && i == 18)
-                {
-                    movingplatform5 = 0;
-                }
+                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                    Destroy(usedPlatform[i]);
+                }*/
+            if (usedPlatform[18].transform.position.x + 2.5 < Cam.transform.position.x - 10)
+            {
+                Destroy(usedPlatform[16].gameObject);
+                Destroy(usedPlatform[17].gameObject);
+                Destroy(usedPlatform[18].gameObject);
+                movingplatform5 = 0;
+                
             }
         }
 
-       
-        
+      
        
         
         
@@ -617,6 +681,30 @@ public class Platforms : MonoBehaviour {
        
 
     }
+    void OnCollisionStay2D(Collision2D col)
+    {
+        if (col.gameObject.name != "Spawner")
+        {
+            Debug.Log("Stay contact");
+            spawn = true;
+        }
+      
+    }
+    void OnCollisionExit2D(Collision2D col)
+    {
+        if(col.gameObject.name == "Spawner")
+        {
+            Debug.Log("Exit contact");
+            spawn = true;
+        }
+        else
+        {
+            spawn = false;
+        }
+        
+        
+    }
+
     /*
     void destroyPlatforms()
     {
