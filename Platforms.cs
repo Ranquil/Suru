@@ -6,12 +6,11 @@ public class Platforms : MonoBehaviour {
 
     public GameObject[] alustat;
     GameObject[] platforms;
-    GameObject Spawner;
+    //GameObject Spawner;
     public float moveSpeed;
     float StartingPoint;
     public Camera maincam;
-    float timer = 0;
-    int chosenPlatforms = 0;
+    GameObject[] chosenPlatforms;
     int movingplatform = 0;
     int movingplatform1 = 0;
     int movingplatform2 = 0;
@@ -19,23 +18,45 @@ public class Platforms : MonoBehaviour {
     int movingplatform4 = 0;
     int movingplatform5 = 0;
     GameObject[] usedPlatform;
-    bool spawn = false;
- 
-
-
-
-
+    Collider2D[] Collit;
+    GameObject Spawner;
+    bool spawn = true;
+    Collider2D[] collis; 
+    Collider2D[] collis1;
+    bool iscolliding;
+    bool isSpawning = false;
+    int[] Randoms;
+    Collider2D triggerstaycol;
+    int time = 0;
     Camera Cam;
-	// Use this for initialization
-	void Start ()
+    bool ebin = false;
+    bool varattu;
+    bool check = false;
+    bool check1 = false;
+    bool check2 = false;
+    bool check3 = false;
+    
+    // Use this for initialization
+    void Start ()
     {
         
         Spawner = new GameObject();
         Spawner.AddComponent<BoxCollider2D>();
         Spawner.AddComponent<Rigidbody2D>().isKinematic = true;
-        Spawner.transform.position = new Vector3(20,0,0);
-        Spawner.GetComponent<BoxCollider2D>().size = new Vector2(20,20);
+        Spawner.transform.position = new Vector3(20, 0, 0);
+        Spawner.GetComponent<BoxCollider2D>().size = new Vector2(20, 20);
         Spawner.gameObject.name = "Spawner";
+        Spawner.GetComponent<BoxCollider2D>().isTrigger = true;
+        Spawner.GetComponent<Rigidbody2D>().sleepMode.Equals(RigidbodySleepMode2D.NeverSleep);
+
+        ebin = true;
+        iscolliding = false;
+        Randoms = new int[4];
+        collis = new Collider2D[2];
+        collis1 = new Collider2D[2];
+        Collit = new Collider2D[alustat.Length + 5];
+        chosenPlatforms = new GameObject[3];
+        
         Cam = maincam.GetComponent<Camera>();
         
         platforms = new GameObject[alustat.Length];
@@ -67,7 +88,7 @@ public class Platforms : MonoBehaviour {
 
         for(int i = 0; i < platforms.Length; i++)
         {
-                platforms[i].AddComponent<Rigidbody2D>().isKinematic = true;
+            Debug.Log("Platform init");
 
                 if(i == 0 || i == 1)
                 {
@@ -76,6 +97,7 @@ public class Platforms : MonoBehaviour {
                     platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 4.375f);
 
                     platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(0, -8.5f);
+                Collit[i] = platforms[i].GetComponent<BoxCollider2D>();
                 }
                 if(i == 2 || i == 3)
                 {
@@ -84,7 +106,8 @@ public class Platforms : MonoBehaviour {
                     platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 4.375f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(1.75f, -8.5f);
-                }
+                Collit[i] = platforms[i].GetComponent<BoxCollider2D>();
+            }
                 if(i == 4 || i == 5)
                 {
                 platforms[i].AddComponent<BoxCollider2D>().size = new Vector2
@@ -92,7 +115,8 @@ public class Platforms : MonoBehaviour {
                    platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 4.375f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(-1.75f, -8.5f);
-                 }
+                Collit[i] = platforms[i].GetComponent<BoxCollider2D>();
+            }
                 if (i == 6)
                 {
                 BoxCollider2D[] Colliders;
@@ -106,7 +130,9 @@ public class Platforms : MonoBehaviour {
                 Colliders = platforms[i].GetComponents<BoxCollider2D>();
                 Colliders[0].offset = new Vector2(-2.625f, -6f);
                 Colliders[1].offset = new Vector2(0, -8.5f);
-                }
+                Collit[i] = Colliders[0];
+                Collit[i + 1] = Colliders[1];
+            }
                 if (i == 7)
                 {
                     BoxCollider2D[] Colliders;
@@ -120,10 +146,12 @@ public class Platforms : MonoBehaviour {
                     Colliders = platforms[i].GetComponents<BoxCollider2D>();
                     Colliders[0].offset = new Vector2(2.625f,-6f);
                     Colliders[1].offset = new Vector2(0, -8.5f);
-                    
-                    
+                Collit[i +1] = Colliders[0];
+                Collit[i + 2] = Colliders[1];
 
-                }
+
+
+            }
             if(i == 10 || i == 11)
             {
                 platforms[i].AddComponent<BoxCollider2D>().size = new Vector2
@@ -131,6 +159,7 @@ public class Platforms : MonoBehaviour {
                         platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 2.25f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(1.9f, -6f);
+                Collit[i + 2] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if (i >= 8 && i <= 9)
             {
@@ -140,7 +169,7 @@ public class Platforms : MonoBehaviour {
                        platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 2.25f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(0, -6f);
-
+                Collit[i + 2] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if(i == 12 || i == 13)
             {
@@ -149,6 +178,7 @@ public class Platforms : MonoBehaviour {
                        platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 2.25f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(-1.9f, -6f);
+                Collit[i + 2] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if(i == 14)
             {
@@ -163,6 +193,8 @@ public class Platforms : MonoBehaviour {
                 Colliders = platforms[i].GetComponents<BoxCollider2D>();
                 Colliders[0].offset = new Vector2(-1.75f, -3.25f);
                 Colliders[1].offset = new Vector2(0, -6f);
+                Collit[i + 2] = Colliders[0];
+                Collit[i + 3] = Colliders[1];
             }
             if(i == 15)
             {
@@ -177,6 +209,8 @@ public class Platforms : MonoBehaviour {
                 Colliders = platforms[i].GetComponents<BoxCollider2D>();
                 Colliders[0].offset = new Vector2(1.75f, -3.25f);
                 Colliders[1].offset = new Vector2(0, -6f);
+                Collit[i + 3] = Colliders[0];
+                Collit[i + 4] = Colliders[1];
             }
             if(i == 16 || i == 17)
             {
@@ -185,6 +219,7 @@ public class Platforms : MonoBehaviour {
                    platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 1.5f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(0, -3.25f);
+                Collit[i + 4] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if(i == 18 || i == 19)
             {
@@ -193,6 +228,7 @@ public class Platforms : MonoBehaviour {
                   platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 1.5f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(2.25f, -3.25f);
+                Collit[i + 4] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if (i == 20 || i == 21)
             {
@@ -201,6 +237,7 @@ public class Platforms : MonoBehaviour {
                   platforms[i].GetComponent<SpriteRenderer>().sprite.bounds.size.y / 1.5f);
 
                 platforms[i].GetComponent<BoxCollider2D>().offset = new Vector2(-2.25f, -3.25f);
+                Collit[i + 4] = platforms[i].GetComponent<BoxCollider2D>();
             }
             if(i == 22)
             {
@@ -218,12 +255,18 @@ public class Platforms : MonoBehaviour {
                 Colliders = platforms[i].GetComponents<BoxCollider2D>();
                 Colliders[0].offset = new Vector2(-4.25f, -3.25f);
                 Colliders[1].offset = new Vector2(0, -8.5f);
+                Collit[i + 4] = Colliders[0];
+                Collit[i + 5] = Colliders[1];
             }
 
            
 
         }
-
+        for (int i = 0; i < Collit.Length; i++)
+        {
+            Debug.Log("Coll init");
+            Collit[i].enabled = false;
+        }
         platforms[0].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         platforms[1].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         platforms[2].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -272,248 +315,391 @@ public class Platforms : MonoBehaviour {
         usedPlatform[21] = platforms[1];
         usedPlatform[22] = platforms[1];
 
+       
         usedPlatform[1] = Instantiate(platforms[2]);
         usedPlatform[2] = Instantiate(platforms[0]);
         usedPlatform[3] = Instantiate(platforms[4]);
+
+        usedPlatform[1].GetComponent<BoxCollider2D>().enabled = true;
+        usedPlatform[2].GetComponent<BoxCollider2D>().enabled = true;
+        usedPlatform[3].GetComponent<BoxCollider2D>().enabled = true;
         movingplatform = 1;
         StartingPoint = platforms[0].transform.position.x;
     }
     void instatePlatforms(int TheRand, int rand, int rand1, int rand2)
     {
+        Debug.Log("Ennen Spawnia päästiin.");
+
         
-        if (spawn == true)
-        {
             int add = 0;
             int add1 = 0;
             int add2 = 0;
+
+
             //  int[] addative = { 4, 5, 7, 8, 13, 14, 16, 17 };
 
-            if (TheRand == 1 && movingplatform == 0)
+            if (TheRand == 1 && movingplatform == 0 && varattu == true)
             {
+
+
+
                 usedPlatform[1] = Instantiate(platforms[rand]);
                 usedPlatform[2] = Instantiate(platforms[rand1]);
                 usedPlatform[3] = Instantiate(platforms[rand2]);
-                chosenPlatforms = TheRand;
+
+                usedPlatform[1].GetComponent<BoxCollider2D>().enabled = true;
+                usedPlatform[2].GetComponent<BoxCollider2D>().enabled = true;
+                usedPlatform[3].GetComponent<BoxCollider2D>().enabled = true;
                 movingplatform = 1;
+            varattu = false;
+
             }
-            else if(TheRand == 1)
+            /*else if (TheRand == 1 && movingplatform == 1)
             {
                 TheRand++;
-            }
-            if (TheRand == 2 && movingplatform1 == 0)
+            }*/
+            if (TheRand == 2 && movingplatform1 == 0 && varattu == true)
             {
 
                 if (rand == 2)
                 {
                     add = 5;
+
                 }
                 if (rand == 3)
                 {
                     add = 7;
+
                 }
                 if (rand1 == 0)
                 {
                     add1 = 8;
+
                 }
                 if (rand1 == 1)
                 {
                     add1 = 7;
+
                 }
                 if (rand2 == 4)
                 {
                     add2 = 2;
+
                 }
                 if (rand2 == 5)
                 {
                     add2 = 1;
+
                 }
+
 
 
                 usedPlatform[4] = Instantiate(platforms[rand + add]);
                 usedPlatform[5] = Instantiate(platforms[rand1 + add1]);
                 usedPlatform[6] = Instantiate(platforms[rand2 + add2]);
-              /*  usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x + 20, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
-                usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x + 20, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
-                usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x + 20, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);*/
-                chosenPlatforms = TheRand;
+
+                if (rand == 2)
+                {
+                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
+                    Boxes = usedPlatform[4].GetComponents<BoxCollider2D>();
+                    Boxes[0].enabled = true;
+                    Boxes[1].enabled = true;
+                }
+                else if (rand == 3)
+                {
+                    usedPlatform[5].GetComponent<BoxCollider2D>().enabled = true;
+                }
+
+                usedPlatform[5].GetComponent<BoxCollider2D>().enabled = true;
+
+                if (rand2 == 4 || rand2 == 5)
+                {
+                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
+                    Boxes = usedPlatform[6].GetComponents<BoxCollider2D>();
+                    Boxes[0].enabled = true;
+                    Boxes[1].enabled = true;
+                }
+
+
+                /*  usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x + 20, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
+                  usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x + 20, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
+                  usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x + 20, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);*/
+
                 movingplatform1 = 1;
-               
-            }
-            else if(TheRand == 2)
+            varattu = false;
+        }
+           /* else if (TheRand == 2 && movingplatform1 == 1)
             {
                 TheRand++;
-            }
-            if (TheRand == 3 && movingplatform2 == 0)
+            }*/
+            if (TheRand == 3 && movingplatform2 == 0 && varattu == true)
             {
+
                 if (rand == 2)
                 {
                     add = 8;
+
                 }
                 if (rand == 3)
                 {
                     add = 8;
+
                 }
                 if (rand1 == 0)
                 {
                     add1 = 9;
+
                 }
                 if (rand1 == 1)
                 {
                     add1 = 8;
+
                 }
                 if (rand2 == 4)
                 {
                     add2 = 9;
+
                 }
                 if (rand2 == 5)
                 {
                     add2 = 8;
+
                 }
+
 
                 usedPlatform[7] = Instantiate(platforms[rand + add]);
                 usedPlatform[8] = Instantiate(platforms[rand1 + add1]);
                 usedPlatform[9] = Instantiate(platforms[rand2 + add2]);
-              /*  usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x + 40, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
-                usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x + 40, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
-                usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x + 40, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);*/
-                chosenPlatforms = TheRand;
+
+                usedPlatform[7].GetComponent<BoxCollider2D>().enabled = true;
+                usedPlatform[8].GetComponent<BoxCollider2D>().enabled = true;
+                usedPlatform[9].GetComponent<BoxCollider2D>().enabled = true;
+                /*  usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x + 40, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
+                  usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x + 40, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
+                  usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x + 40, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);*/
+
                 movingplatform2 = 1;
-            }
-            else if(TheRand == 3)
+            varattu = false;
+        }
+           /* else if (TheRand == 3 && movingplatform2 == 1)
             {
                 TheRand++;
-            }
-            if (TheRand == 4 && movingplatform3 == 0)
+            }*/
+            if (TheRand == 4 && movingplatform3 == 0 && varattu == true)
             {
+
                 if (rand == 2)
                 {
                     add = 13;
+
                 }
                 if (rand == 3)
                 {
                     add = 12;
+
                 }
                 if (rand1 == 0)
                 {
                     add1 = 16;
+
                 }
                 if (rand1 == 1)
                 {
                     add1 = 15;
+
                 }
                 if (rand2 == 4)
                 {
                     add2 = 16;
+
                 }
                 if (rand2 == 5)
                 {
                     add2 = 17;
+
                 }
+
                 usedPlatform[10] = Instantiate(platforms[rand + add]);
                 usedPlatform[11] = Instantiate(platforms[rand1 + add1]);
                 usedPlatform[12] = Instantiate(platforms[rand2 + add2]);
+
+                if (rand == 2 || rand == 3)
+                {
+                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
+                    Boxes = usedPlatform[10].GetComponents<BoxCollider2D>();
+                    Boxes[0].enabled = true;
+                    Boxes[1].enabled = true;
+                }
+
+                usedPlatform[11].GetComponent<BoxCollider2D>().enabled = true;
+                usedPlatform[12].GetComponent<BoxCollider2D>().enabled = true;
+
                 /*usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x + 60, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
                 usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x + 60, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
                 usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x + 60, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);*/
-                chosenPlatforms = TheRand;
-                movingplatform3 = 1;
-            }
-            else if(TheRand == 4)
-            {
-                TheRand = 1;
-            }
-           /* if (TheRand == 5)
-            {
-                if (rand == 2)
-                {
-                    add = 5;
-                }
-                if (rand == 3)
-                {
-                    add = 4;
-                }
-                if (rand1 == 0)
-                {
-                    add1 = 8;
-                }
-                if (rand1 == 1)
-                {
-                    add1 = 7;
-                }
-                if (rand2 == 4)
-                {
-                    add2 = 7;
-                }
-                if (rand2 == 5)
-                {
-                    add2 = 7;
-                }
-                usedPlatform[13] = platforms[rand];
-                usedPlatform[14] = platforms[rand1];
-                usedPlatform[15] = platforms[rand2];
-                chosenPlatforms = TheRand;
-                movingplatform4 = 1;
-            }
-            if (TheRand == 6)
-            {
-                if (rand == 2)
-                {
-                    add = 5;
-                }
-                if (rand == 3)
-                {
-                    add = 4;
-                }
-                if (rand1 == 0)
-                {
-                    add1 = 8;
-                }
-                if (rand1 == 1)
-                {
-                    add1 = 7;
-                }
-                if (rand2 == 4)
-                {
-                    add2 = 7;
-                }
-                if (rand2 == 5)
-                {
-                    add2 = 7;
-                }
-                usedPlatform[16] = platforms[rand];
-                usedPlatform[17] = platforms[rand1];
-                usedPlatform[18] = platforms[rand2];
-                chosenPlatforms = TheRand;
-                movingplatform5 = 1;
-            }*/
-        }
-        else if (timer > 1.5f)
-        {
-            timer = 0;
-        }
 
-        movePlatforms(chosenPlatforms);
+                movingplatform3 = 1;
+            varattu = false;
+        }
+        /*else if (TheRand == 4 && movingplatform3 == 1)
+        {
+            TheRand = 1;
+        }*/
+        /* if (TheRand == 5)
+         {
+             if (rand == 2)
+             {
+                 add = 5;
+             }
+             if (rand == 3)
+             {
+                 add = 4;
+             }
+             if (rand1 == 0)
+             {
+                 add1 = 8;
+             }
+             if (rand1 == 1)
+             {
+                 add1 = 7;
+             }
+             if (rand2 == 4)
+             {
+                 add2 = 7;
+             }
+             if (rand2 == 5)
+             {
+                 add2 = 7;
+             }
+             usedPlatform[13] = platforms[rand];
+             usedPlatform[14] = platforms[rand1];
+             usedPlatform[15] = platforms[rand2];
+             chosenPlatforms = TheRand;
+             movingplatform4 = 1;
+         }
+         if (TheRand == 6)
+         {
+             if (rand == 2)
+             {
+                 add = 5;
+             }
+             if (rand == 3)
+             {
+                 add = 4;
+             }
+             if (rand1 == 0)
+             {
+                 add1 = 8;
+             }
+             if (rand1 == 1)
+             {
+                 add1 = 7;
+             }
+             if (rand2 == 4)
+             {
+                 add2 = 7;
+             }
+             if (rand2 == 5)
+             {
+                 add2 = 7;
+             }
+             usedPlatform[16] = platforms[rand];
+             usedPlatform[17] = platforms[rand1];
+             usedPlatform[18] = platforms[rand2];
+             chosenPlatforms = TheRand;
+             movingplatform5 = 1;
+         }*/
+
+        varattu = true;
+        spawn = true;
+        
         
     }
     // Update is called once per frame
+    
+    
     void Update()
     {
-
-        instatePlatforms(Random.Range(1, 4), Random.Range(2, 3), Random.Range(0, 1), Random.Range(4, 5));
         
+        CheckCollision();
         
+             
+           
 
+       
+        movePlatforms();
+       
+        iscolliding = false;
        // destroyPlatforms();
        
 
     }
 
-    void FixedUpdate()
+    void CheckCollision()
     {
-        timer = timer + (1f / 60f);
-    }
 
-    void movePlatforms(int choosedPlatforms)
+        for(int i = 0; i <usedPlatform.Length; i++)
+        {
+            
+                if (usedPlatform[i] != null && i < 13 && i != 0)
+                {
+                    if (i < 4 && i > 0)
+                    {
+                        if (usedPlatform[3].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
+                        {
+                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+
+                        }
+                    }
+                    if (i < 7 && i> 3)
+                    {
+                        if (usedPlatform[6].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
+                        {
+                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+                        }
+                    }
+                    if (i< 10 && i > 6)
+                    {
+                        if (usedPlatform[9].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
+                        {
+                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+                        }
+                    }
+                    if (i < 13 && i > 9)
+                    {
+                        if (usedPlatform[12].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
+                        {
+                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+                        }
+                    }
+                }
+                
+                
+
+            }
+        bool Allmet = true;
+        for (int s = 0; s < usedPlatform.Length; s++)
+        {
+            if (usedPlatform[s] != null && s < 13 && s != 0)
+            {
+                Debug.Log("Else in update");
+                Allmet = false;
+            }
+
+
+        }
+        if (Allmet)
+        {
+            Debug.Log("ALLMet");
+            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+        }
+
+
+    }
+       
+  
+  
+    void movePlatforms()
     {
         /*
         platforms[0].transform.position = new Vector3(platforms[0].transform.position.x - moveSpeed, platforms[0].transform.position.y, platforms[0].transform.position.z);
@@ -556,6 +742,7 @@ public class Platforms : MonoBehaviour {
                  }*/
             if (usedPlatform[3].transform.position.x + 2.5 < Cam.transform.position.x - 10)
             {
+                
                 Destroy(usedPlatform[1].gameObject);
                 Destroy(usedPlatform[2].gameObject);
                 Destroy(usedPlatform[3].gameObject);
@@ -579,9 +766,11 @@ public class Platforms : MonoBehaviour {
                 }*/
                 if (usedPlatform[6].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                    Destroy(usedPlatform[4].gameObject);
-                    Destroy(usedPlatform[5].gameObject);
-                    Destroy(usedPlatform[6].gameObject);
+                
+
+                Destroy(usedPlatform[4]);
+                    Destroy(usedPlatform[5]);
+                    Destroy(usedPlatform[6]);
                     Debug.Log("Moving Platform päästiin.");
                     movingplatform1 = 0;
                 }
@@ -601,7 +790,10 @@ public class Platforms : MonoBehaviour {
                 }*/
                 if (usedPlatform[9].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                    Destroy(usedPlatform[7].gameObject);
+
+              
+
+                Destroy(usedPlatform[7].gameObject);
                     Destroy(usedPlatform[8].gameObject);
                     Destroy(usedPlatform[9].gameObject);
                     movingplatform2 = 0;
@@ -622,7 +814,11 @@ public class Platforms : MonoBehaviour {
                 }*/
                 if (usedPlatform[12].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                    Destroy(usedPlatform[10].gameObject);
+                
+
+               
+
+                Destroy(usedPlatform[10].gameObject);
                     Destroy(usedPlatform[11].gameObject);
                     Destroy(usedPlatform[12].gameObject);
                     movingplatform3 = 0;
@@ -668,42 +864,102 @@ public class Platforms : MonoBehaviour {
                 Destroy(usedPlatform[16].gameObject);
                 Destroy(usedPlatform[17].gameObject);
                 Destroy(usedPlatform[18].gameObject);
+                
                 movingplatform5 = 0;
                 
             }
         }
 
       
-       
-        
-        
-        
-       
 
     }
-    void OnCollisionStay2D(Collision2D col)
+    
+  /* void OnTriggerStay2D(Collider2D col)
     {
-        if (col.gameObject.name != "Spawner")
-        {
-            Debug.Log("Stay contact");
-            spawn = true;
-        }
-      
-    }
-    void OnCollisionExit2D(Collision2D col)
+         if (col.gameObject.tag == "Platform")
+         {
+             return;
+         }
+
+       
+
+
+    }*/
+    public GameObject[] getPlatforms(bool whole)
     {
-        if(col.gameObject.name == "Spawner")
+        GameObject[] fstplatform = new GameObject[3];
+        GameObject[] sstplatform = new GameObject[3];
+        GameObject[] tstplatform = new GameObject[3];
+        GameObject[] fostplatform = new GameObject[3];
+
+        if(whole)
         {
-            Debug.Log("Exit contact");
-            spawn = true;
+            return usedPlatform;
         }
-        else
+
+        if(usedPlatform[1] != null && usedPlatform[2] != null && usedPlatform[3] != null && 
+            usedPlatform[4] != null && usedPlatform[5] != null && usedPlatform[6] != null &&
+            usedPlatform[7] != null && usedPlatform[8] != null && usedPlatform[9] != null &&
+            usedPlatform[10] != null && usedPlatform[11] != null && usedPlatform[12] != null)
         {
-            spawn = false;
+            return usedPlatform;
+        }
+
+        if (usedPlatform[1] != null && usedPlatform[2] != null && usedPlatform[3] != null)
+        {
+
+
+            fstplatform[0] = usedPlatform[1];
+            fstplatform[1] = usedPlatform[2];
+            fstplatform[2] = usedPlatform[3];
+
+            return fstplatform;
         }
         
-        
+        if (usedPlatform[4] != null && usedPlatform[5] != null && usedPlatform[6] != null)
+        {
+            sstplatform[0] = usedPlatform[4];
+            sstplatform[1] = usedPlatform[5];
+            sstplatform[2] = usedPlatform[6];
+            return sstplatform;
+        }
+       
+        if (usedPlatform[7] != null && usedPlatform[8] != null && usedPlatform[9] != null)
+        {
+            tstplatform[0] = usedPlatform[7];
+            tstplatform[1] = usedPlatform[8];
+            tstplatform[2] = usedPlatform[9];
+            return tstplatform;
+        }
+
+        if (usedPlatform[10] != null && usedPlatform[11] != null && usedPlatform[12] != null)
+        {
+            fostplatform[0] = usedPlatform[10];
+            fostplatform[1] = usedPlatform[11];
+            fostplatform[2] = usedPlatform[12];
+            return fostplatform;
+
+        }
+        return null;
     }
+
+
+   /* void OnTriggerExit2D(Collider2D col)
+    {
+       
+            if (iscolliding) return;
+
+            iscolliding = true;
+
+            if (col.gameObject.tag == "Platform")
+            {
+
+                 instatePlatforms(Random.Range(1, 4), Random.Range(2, 3), Random.Range(0, 1), Random.Range(4, 5));
+
+            }
+        
+    }*/
+
 
     /*
     void destroyPlatforms()

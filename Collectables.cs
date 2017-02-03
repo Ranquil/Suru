@@ -4,36 +4,52 @@ using System.Collections;
 public class Collectables : MonoBehaviour {
 
     public GameObject Collectable;
-    public GameObject[] Platforms;
+    public GameObject Level;
+    GameObject[] platforms;
     public GameObject Player;
+    bool nibe = false;
     GameObject[] Colls;
-    
     Transform[] collTrans;
+    GameObject[] SaveColls;
+
     int j = 0;
-    int i = 0;
+    int k = 0;
     float[] lengthtoSurface;
+    
     // Use this for initialization
-    void Awake()
+    void Start ()
     {
         lengthtoSurface = new float[23];
 
         Colls = new GameObject[23];
-
+        
         collTrans = new Transform[23];
+
+        Collectable.GetComponent<Rigidbody2D>().sleepMode = RigidbodySleepMode2D.NeverSleep;
+        platforms = Level.GetComponent<Platforms>().getPlatforms(true);
+
+        SaveColls = new GameObject[Colls.Length];
         for (int i = 0; i < Colls.Length; i++)
         {
-            Colls[i] = Collectable;
-            collTrans[i] = Colls[i].transform;
 
+            Colls[i] = Instantiate(Collectable);
 
+            /*
+            Colls[i].AddComponent<SpriteRenderer>();
             Colls[i].AddComponent<BoxCollider2D>();
-            Colls[i].AddComponent<Rigidbody2D>();
-            Colls[i].GetComponent<Rigidbody2D>().isKinematic = true;
+            Colls[i].GetComponent<SpriteRenderer>().sprite = Collectable.GetComponent<SpriteRenderer>().sprite;
+            */
+
+            collTrans[i] = Colls[i].GetComponent<Transform>();
+            
         }
-    }
-    void Start ()
-    {
         
+
+        for(int i = 0; i < Colls.Length;i++)
+        {
+            SaveColls[i] = Instantiate(Colls[i], collTrans[i]) as GameObject;
+            SaveColls[i].GetComponent<BoxCollider2D>().isTrigger = true;
+        }
        
         lengthtoSurface[0] = 2.5f;
         lengthtoSurface[1] = 2.5f;
@@ -59,50 +75,64 @@ public class Collectables : MonoBehaviour {
         lengthtoSurface[21] = 4.5f;
         lengthtoSurface[22] = 4.5f;
 
-        
 
+        nibe = true;
 
     }
-    void OnCollisionEnter(Collision col)
+   
+     void collisioncheck()
+    {
+        for (int i = 0; i < SaveColls.Length; i++)
+        {
+            if (SaveColls[i] != null && SaveColls[i].GetComponent<BoxCollider2D>().IsTouching(Player.GetComponent<BoxCollider2D>()))
+            {
+                Debug.Log("Player törmäsi Collectableen");
+                SaveColls[i].GetComponent<SpriteRenderer>().sprite = null;
+                Destroy(SaveColls[i].gameObject);
+            }
+        }
+    }
+    
+   /* void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "Player")
         {
-            Destroy(this.gameObject);
+            
+            for(int i = 0; i < SaveColls.Length;i++)
+            {
+                if(SaveColls[i].name == Player.GetComponent<Player>().getHitCollect())
+                {
+                    
+                }
+            }
+            
         }
-    }
+    }*/
 	
 	// Update is called once per frame
 	void Update ()
     {
-
-	   
-	}
+        platforms = Level.gameObject.GetComponent<Platforms>().getPlatforms(true);
+        collisioncheck();
+    }
     void FixedUpdate()
     {
+       
 
-
-        collTrans[i].position = new Vector3(Platforms[j].transform.position.x, Platforms[j].transform.position.y + lengthtoSurface[j], Platforms[j].transform.position.z);
-
-
-        Instantiate(Colls[i], collTrans[i]);
-
-        if (j < 22)
+        if (nibe == true)
         {
-            j++;
-        }
-        if(i < Colls.Length)
-        {
-            i++;
-        }
-        if(j == 22)
-        {
-            j = 0;
-        }
-        if(i == Colls.Length)
-        {
-            i = 0;
-        }
+            for (int i = 0; i < platforms.Length; i++)
+            {
+                if (platforms[i] != null && SaveColls[i] != null && i < 13 && i != 0)
+                {
 
-
+                    SaveColls[i].transform.position = new Vector3(platforms[i].transform.position.x, platforms[i].transform.position.y + lengthtoSurface[i], platforms[i].transform.position.z);
+                    
+                }
+           
+               
+            }
+        }
+        
     }
 }
