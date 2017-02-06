@@ -16,7 +16,6 @@ public enum level_id
     _length
 }
 
-[System.Serializable]
 public class LevelData : MonoBehaviour
 {
     public level_id levelID;
@@ -27,7 +26,7 @@ public class LevelData : MonoBehaviour
     public GameObject musicPlayer;
     public float speedIncreaser;
     //Use the following things only if you think they'd be useful.
-    GameObject blockToGenerate;
+    GameObject blockToGenerate; //Once ChooseLevelBlock() has been run, create this GameObject.
     GameObject lastBlock;
     GameObject blockBeforeLast;
     int rng;
@@ -47,10 +46,7 @@ public class LevelData : MonoBehaviour
     public Gameobject highRight;
     public Gameobject higToMid;
     public Gameobject highToLow;
-}
 
-public class LevelGeneration : MonoBehaviour
-{
     public void ChooseLevelBlock()
     {
         if (lastBlock == lowLeft || lastBlock == midLeft || lastBlock == highLeft)  //If it's a right corner block, the next block is a gap.
@@ -58,7 +54,7 @@ public class LevelGeneration : MonoBehaviour
             blockBeforeLast = lastBlock;
             lastBlock = blockToGenerate;
             blockToGenerate = null;
-            Console.WriteLine("Gap");
+            Debug.Log("Gap");
         }
 
         else if (lastBlock == lowLeft || lastBlock == lowMiddle || lastBlock == midToLow || lastBlock == highToLow)
@@ -74,18 +70,18 @@ public class LevelGeneration : MonoBehaviour
                 if (rng <= 0.5f)
                 {
                     blockToGenerate = lowRight;
-                    Console.WriteLine("Low Right");
+                    Debug.Log("Low Right");
                 }
                 else
                 {
                     blockToGenerate = lowToMid;
-                    Console.WriteLine("Low to Mid");
+                    Debug.Log("Low to Mid");
                 }
             }
             else
             {
                 blockToGenerate = lowMiddle;
-                Console.WriteLine("Low Middle");
+                Debug.Log("Low Middle");
             }
         }
 
@@ -102,23 +98,23 @@ public class LevelGeneration : MonoBehaviour
                 if (rng == 0)
                 {
                     blockToGenerate = midRight;
-                    Console.WriteLine("Mid Right");
+                    Debug.Log("Mid Right");
                 }
                 else if (rng == 1)
                 {
                     blockToGenerate = midToLow;
-                    Console.WriteLine("Mid to Low");
+                    Debug.Log("Mid to Low");
                 }
                 else
                 {
                     blockToGenerate = midToHigh;
-                    Console.WriteLine("Mid to High");
+                    Debug.Log("Mid to High");
                 }
             }
             else
             {
                 blockToGenerate = midMiddle;
-                Console.WriteLine("Mid Middle");
+                Debug.Log("Mid Middle");
             }
         }
 
@@ -135,23 +131,23 @@ public class LevelGeneration : MonoBehaviour
                 if (rng == 0)
                 {
                     blockToGenerate = highRight;
-                    Console.WriteLine("High Right");
+                    Debug.Log("High Right");
                 }
                 else if (rng2 == 1)
                 {
                     blockToGenerate = highToMid;
-                    Console.WriteLine("High to Mid");
+                    Debug.Log("High to Mid");
                 }
                 else
                 {
                     blockToGenerate = highToLow;
-                    Console.WriteLine("High to Low");
+                    Debug.Log("High to Low");
                 }
             }
             else
             {
                 blockToGenerate = highMiddle;
-                Console.WriteLine("High Middle");
+                Debug.Log("High Middle");
             }
         }
 
@@ -163,7 +159,7 @@ public class LevelGeneration : MonoBehaviour
                 lastBlock = blockToGenerate;
 
                 blockToGenerate = lowLeft;
-                Console.WriteLine("Low Left");
+                Debug.Log("Low Left");
             }
 
             else if (blockBeforeLast == midRight)
@@ -175,12 +171,12 @@ public class LevelGeneration : MonoBehaviour
                 if (rng == 0)
                 {
                     blockToGenerate = midLeft;
-                    Console.WriteLine("Mid Left");
+                    Debug.Log("Mid Left");
                 }
                 else
                 {
                     blockToGenerate = lowLeft;
-                    Console.WriteLine("Low Left;");
+                    Debug.Log("Low Left;");
                 }
             }
 
@@ -193,17 +189,17 @@ public class LevelGeneration : MonoBehaviour
                 if (rng == 0)
                 {
                     blockToGenerate = highLeft;
-                    Console.WriteLine("High Left");
+                    Debug.Log("High Left");
                 }
                 else if (rng == 1)
                 {
                     blockToGenerate = midLeft;
-                    Console.WriteLine("Mid Left");
+                    Debug.Log("Mid Left");
                 }
                 else
                 {
                     blockToGenerate = lowLeft;
-                    Console.WriteLine("Low Left;");
+                    Debug.Log("Low Left;");
                 }
             }
         }
