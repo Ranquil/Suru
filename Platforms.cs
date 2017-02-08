@@ -30,11 +30,10 @@ public class Platforms : MonoBehaviour {
     int time = 0;
     Camera Cam;
     bool ebin = false;
-    bool varattu;
-    bool check = false;
-    bool check1 = false;
-    bool check2 = false;
-    bool check3 = false;
+    bool varattu = false;
+    bool PlatformNelja = false;
+    
+   
     
     // Use this for initialization
     void Start ()
@@ -338,7 +337,7 @@ public class Platforms : MonoBehaviour {
 
             //  int[] addative = { 4, 5, 7, 8, 13, 14, 16, 17 };
 
-            if (TheRand == 1 && movingplatform == 0 && varattu == true)
+            if (TheRand == 1 && movingplatform == 0)
             {
 
 
@@ -351,14 +350,14 @@ public class Platforms : MonoBehaviour {
                 usedPlatform[2].GetComponent<BoxCollider2D>().enabled = true;
                 usedPlatform[3].GetComponent<BoxCollider2D>().enabled = true;
                 movingplatform = 1;
-            varattu = false;
-
+         
             }
-            /*else if (TheRand == 1 && movingplatform == 1)
-            {
-                TheRand++;
-            }*/
-            if (TheRand == 2 && movingplatform1 == 0 && varattu == true)
+        
+        /*else if (TheRand == 1 && movingplatform == 1)
+        {
+            TheRand++;
+        }*/
+        if (TheRand == 2 && movingplatform1 == 0)
             {
 
                 if (rand == 2)
@@ -404,11 +403,15 @@ public class Platforms : MonoBehaviour {
                     Boxes = usedPlatform[4].GetComponents<BoxCollider2D>();
                     Boxes[0].enabled = true;
                     Boxes[1].enabled = true;
+                PlatformNelja = false;
                 }
                 else if (rand == 3)
                 {
-                    usedPlatform[5].GetComponent<BoxCollider2D>().enabled = true;
-                }
+                
+                    usedPlatform[4].GetComponent<BoxCollider2D>().enabled = true;
+                PlatformNelja = true;
+
+                 }
 
                 usedPlatform[5].GetComponent<BoxCollider2D>().enabled = true;
 
@@ -426,13 +429,14 @@ public class Platforms : MonoBehaviour {
                   usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x + 20, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);*/
 
                 movingplatform1 = 1;
-            varattu = false;
+          
         }
-           /* else if (TheRand == 2 && movingplatform1 == 1)
-            {
-                TheRand++;
-            }*/
-            if (TheRand == 3 && movingplatform2 == 0 && varattu == true)
+        
+        /* else if (TheRand == 2 && movingplatform1 == 1)
+         {
+             TheRand++;
+         }*/
+        if (TheRand == 3 && movingplatform2 == 0)
             {
 
                 if (rand == 2)
@@ -479,13 +483,14 @@ public class Platforms : MonoBehaviour {
                   usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x + 40, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);*/
 
                 movingplatform2 = 1;
-            varattu = false;
+           
         }
-           /* else if (TheRand == 3 && movingplatform2 == 1)
-            {
-                TheRand++;
-            }*/
-            if (TheRand == 4 && movingplatform3 == 0 && varattu == true)
+        
+        /* else if (TheRand == 3 && movingplatform2 == 1)
+         {
+             TheRand++;
+         }*/
+        if (TheRand == 4 && movingplatform3 == 0 )
             {
 
                 if (rand == 2)
@@ -532,15 +537,27 @@ public class Platforms : MonoBehaviour {
                 }
 
                 usedPlatform[11].GetComponent<BoxCollider2D>().enabled = true;
+            if (rand2 == 5)
+            {
+                BoxCollider2D[] Boxes = new BoxCollider2D[2];
+                Boxes = usedPlatform[12].GetComponents<BoxCollider2D>();
+                Boxes[0].enabled = true;
+                Boxes[1].enabled = true;
+            }
+            else if(rand2 == 4 )
+            {
                 usedPlatform[12].GetComponent<BoxCollider2D>().enabled = true;
+            }
+            
 
                 /*usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x + 60, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
                 usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x + 60, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
                 usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x + 60, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);*/
 
                 movingplatform3 = 1;
-            varattu = false;
+            
         }
+       
         /*else if (TheRand == 4 && movingplatform3 == 1)
         {
             TheRand = 1;
@@ -610,8 +627,7 @@ public class Platforms : MonoBehaviour {
              movingplatform5 = 1;
          }*/
 
-        varattu = true;
-        spawn = true;
+      
         
         
     }
@@ -623,9 +639,6 @@ public class Platforms : MonoBehaviour {
         
         CheckCollision();
         
-             
-           
-
        
         movePlatforms();
        
@@ -634,50 +647,45 @@ public class Platforms : MonoBehaviour {
        
 
     }
+    public bool getNeljaPlatform()
+    {
+        return PlatformNelja;
+    }
 
     void CheckCollision()
     {
-
-        for(int i = 0; i <usedPlatform.Length; i++)
+        bool check = true;
+        varattu = true;
+        for (int i = 0; i < usedPlatform.Length; i++)
         {
-            
-                if (usedPlatform[i] != null && i < 13 && i != 0)
-                {
-                    if (i < 4 && i > 0)
-                    {
-                        if (usedPlatform[3].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
-                        {
-                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
 
-                        }
-                    }
-                    if (i < 7 && i> 3)
-                    {
-                        if (usedPlatform[6].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
-                        {
-                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
-                        }
-                    }
-                    if (i< 10 && i > 6)
-                    {
-                        if (usedPlatform[9].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
-                        {
-                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
-                        }
-                    }
-                    if (i < 13 && i > 9)
-                    {
-                        if (usedPlatform[12].GetComponent<SpriteRenderer>().sprite.rect.xMax < Cam.pixelRect.xMax)
-                        {
-                            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
-                        }
-                    }
-                }
-                
-                
+            if (usedPlatform[i] != null && i < 13 && i != 0)
+            {
+                varattu = false;
+            }
+            
+        if (varattu == true)
+        {
+
+            if (usedPlatform[3] != null && usedPlatform[3].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
+                    usedPlatform[6] != null && usedPlatform[6].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
+                    usedPlatform[9] != null && usedPlatform[9].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
+                    usedPlatform[12] != null && usedPlatform[12].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()))
+            {
+
+                check = false;
 
             }
-        bool Allmet = true;
+        }
+
+        }
+        if (check)
+        {
+            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+            check = false;
+            
+        }
+       /* bool Allmet = true;
         for (int s = 0; s < usedPlatform.Length; s++)
         {
             if (usedPlatform[s] != null && s < 13 && s != 0)
@@ -694,7 +702,7 @@ public class Platforms : MonoBehaviour {
             instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
         }
 
-
+        */
     }
        
   
@@ -769,6 +777,7 @@ public class Platforms : MonoBehaviour {
                 
 
                 Destroy(usedPlatform[4]);
+                PlatformNelja = false;
                     Destroy(usedPlatform[5]);
                     Destroy(usedPlatform[6]);
                     Debug.Log("Moving Platform päästiin.");
@@ -790,9 +799,7 @@ public class Platforms : MonoBehaviour {
                 }*/
                 if (usedPlatform[9].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-
-              
-
+                
                 Destroy(usedPlatform[7].gameObject);
                     Destroy(usedPlatform[8].gameObject);
                     Destroy(usedPlatform[9].gameObject);
@@ -815,9 +822,6 @@ public class Platforms : MonoBehaviour {
                 if (usedPlatform[12].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
                 
-
-               
-
                 Destroy(usedPlatform[10].gameObject);
                     Destroy(usedPlatform[11].gameObject);
                     Destroy(usedPlatform[12].gameObject);

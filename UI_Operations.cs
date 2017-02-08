@@ -57,7 +57,7 @@ public class UI_Operations : MonoBehaviour {
 
                     player.GetComponent<SpriteRenderer>().enabled = true;
                     player.GetComponent<BoxCollider2D>().enabled = true;
-                    player.GetComponent<CircleCollider2D>().enabled = true;
+                    //player.GetComponent<CircleCollider2D>().enabled = true;
                     player.GetComponent<Player>().enabled = true;
 
                     Buttons_box[0].enabled = false;
@@ -137,7 +137,7 @@ public class UI_Operations : MonoBehaviour {
 
                 player.GetComponent<SpriteRenderer>().enabled = true;
                 player.GetComponent<BoxCollider2D>().enabled = true;
-                player.GetComponent<CircleCollider2D>().enabled = true;
+                //player.GetComponent<CircleCollider2D>().enabled = true;
                 player.GetComponent<Player>().enabled = true;
 
                 BackGrounds[0].GetComponent<SpriteRenderer>().enabled = false;
