@@ -53,6 +53,20 @@ public class Player : MonoBehaviour {
         }
         Hitrays();
         keepcolliding();
+
+        if(falling == false)
+        {
+            player.GetComponent<Rigidbody2D>().gravityScale = 0;
+            player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            player.GetComponent<Rigidbody2D>().mass = 0;
+        }
+        else
+        {
+            player.GetComponent<Rigidbody2D>().gravityScale = 1;
+            
+            player.GetComponent<Rigidbody2D>().mass = 10;
+        }
+
         
 #if UNITY_EDITOR
 
@@ -149,8 +163,8 @@ public class Player : MonoBehaviour {
         }
         if (hitted[1] == true || hitted[2] == true)
         {
-            player.GetComponent<Rigidbody2D>().gravityScale = 0;
-            player.GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
+            
+
 
             falling = false;
             Debug.Log("Not Falling");
@@ -178,12 +192,12 @@ public class Player : MonoBehaviour {
     {
        
 
-        PlayerRays[0].origin = new Vector3(player.transform.position.x, player.transform.position.y,0);
-        PlayerRays[1].origin = new Vector3(player.transform.position.x + player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x - 0.1f, player.transform.position.y ,0);
-        PlayerRays[2].origin = new Vector3(player.transform.position.x - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x + 0.1f, player.transform.position.y ,0);
-        PlayerRays[3].origin = new Vector3(player.transform.position.x, player.transform.position.y,0);
-        PlayerRays[4].origin = new Vector3(player.transform.position.x, player.transform.position.y - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y + 0.1f,0);
-        PlayerRays[5].origin = new Vector3(player.transform.position.x, player.transform.position.y - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y + 0.1f,0);
+        PlayerRays[0].origin = new Vector3(player.transform.position.x - 0.2f, player.transform.position.y,0);
+        PlayerRays[1].origin = new Vector3(player.transform.position.x + player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x - 0.5f, player.transform.position.y ,0);
+        PlayerRays[2].origin = new Vector3(player.transform.position.x - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x + 0.5f, player.transform.position.y ,0);
+        PlayerRays[3].origin = new Vector3(player.transform.position.x + 0.2f, player.transform.position.y,0);
+        PlayerRays[4].origin = new Vector3(player.transform.position.x + 0.2f, player.transform.position.y - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y + 0.3f,0);
+        PlayerRays[5].origin = new Vector3(player.transform.position.x - 0.2f, player.transform.position.y - player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y + 0.3f,0);
 
         PlayerRays[0].direction = new Vector3(1, 0,0);
         PlayerRays[1].direction = new Vector3(0, -1,0);
@@ -197,18 +211,23 @@ public class Player : MonoBehaviour {
         hits[0] = Physics2D.Raycast(PlayerRays[0].origin,PlayerRays[0].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
         hits[1] = Physics2D.Raycast(PlayerRays[1].origin,PlayerRays[1].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
         hits[2] = Physics2D.Raycast(PlayerRays[2].origin,PlayerRays[2].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
-        hits[3] = Physics2D.Raycast(PlayerRays[3].origin,PlayerRays[3].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
+        hits[3] = Physics2D.Raycast(PlayerRays[3].origin,PlayerRays[3].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x );
         hits[4] = Physics2D.Raycast(PlayerRays[4].origin,PlayerRays[4].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
-        hits[5] = Physics2D.Raycast(PlayerRays[5].origin, PlayerRays[5].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
+        hits[5] = Physics2D.Raycast(PlayerRays[5].origin, PlayerRays[5].direction, player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x );
 
-        Debug.DrawRay(PlayerRays[1].origin, PlayerRays[1].direction, Color.red);
+        Debug.DrawRay(PlayerRays[0].origin, PlayerRays[0].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x, Color.red);  
+        Debug.DrawRay(PlayerRays[1].origin, PlayerRays[1].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y, Color.blue);
+        Debug.DrawRay(PlayerRays[2].origin, PlayerRays[2].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y, Color.blue);
+        Debug.DrawRay(PlayerRays[3].origin, PlayerRays[3].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x, Color.red);
+        Debug.DrawRay(PlayerRays[4].origin, PlayerRays[4].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x, Color.red);
+        Debug.DrawRay(PlayerRays[5].origin, PlayerRays[5].direction * player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x, Color.red);
 
-       /* points[0] = PlayerRays[0].GetPoint(player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
-        points[1] = PlayerRays[1].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
-        points[2] = PlayerRays[2].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
-        points[3] = PlayerRays[3].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
-        points[4] = PlayerRays[4].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
-        points[5] = PlayerRays[5].GetPoint(player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);*/
+        /* points[0] = PlayerRays[0].GetPoint(player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
+         points[1] = PlayerRays[1].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
+         points[2] = PlayerRays[2].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.y);
+         points[3] = PlayerRays[3].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
+         points[4] = PlayerRays[4].GetPoint(-player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);
+         points[5] = PlayerRays[5].GetPoint(player.GetComponent<SpriteRenderer>().sprite.bounds.extents.x);*/
 
         for (int i = 0; i <platforms.Length;i++)
         {
@@ -232,6 +251,7 @@ public class Player : MonoBehaviour {
                             {
                                  hitted[1] = true;
                         Debug.Log("maahan osui");
+                        break;
                             }
                             else
                             {
@@ -242,6 +262,7 @@ public class Player : MonoBehaviour {
                             {
                                 hitted[2] = true;
                         Debug.Log("maahan osui");
+                        break;
                     }
                             else 
                             {
@@ -289,44 +310,46 @@ public class Player : MonoBehaviour {
                             }
                             if (boxes.Length > 1 && boxes[0] == hits[1].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0 && falling == true || boxes.Length > 1 && boxes[1] == hits[1].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0 && falling == true)
                             {
-                                hitted[0] = false;
+                                hitted[1] = true;
+                        break;
                             }
                             else
                             {
-                                hitted[0] = false;
+                                hitted[1] = false;
                             }
                             if (boxes.Length > 1 && boxes[0] == hits[2].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0 && falling == true || boxes.Length > 1 && boxes[1] == hits[2].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0 && falling == true)
                             {
-                                hitted[0] = true;
+                                hitted[2] = true;
+                        break;
                             }
                             else
                             {
-                                hitted[0] = false;
+                                hitted[2] = false;
                             }
 
                             if (boxes.Length > 1 && boxes[0] == hits[3].collider && player.GetComponent<Rigidbody2D>().velocity.x < 0 || boxes.Length > 1 && boxes[1] == hits[3].collider && player.GetComponent<Rigidbody2D>().velocity.x < 0)
                            {
-                                hitted[0] = true;
+                                hitted[3] = true;
                             }
                             else
                             {
-                                hitted[0] = false;
+                                hitted[3] = false;
                             }
                             if (boxes.Length > 1 && boxes[0] == hits[4].collider && player.GetComponent<Rigidbody2D>().velocity.x < 0 || boxes.Length > 1 && boxes[1] == hits[4].collider && player.GetComponent<Rigidbody2D>().velocity.x < 0)
                             {
-                                hitted[0] = true;
+                                hitted[4] = true;
                             }
                             else
                             {
-                                hitted[0] = false;
+                                hitted[4] = false;
                             }
                             if (boxes.Length > 1 && boxes[0] == hits[5].collider && player.GetComponent<Rigidbody2D>().velocity.x > 0 || boxes.Length > 1 && boxes[1] == hits[5].collider && player.GetComponent<Rigidbody2D>().velocity.x > 0)
                             {
-                                hitted[0] = true;
+                                hitted[5] = true;
                             }
                             else
                             {
-                                hitted[0] = false;
+                                hitted[5] = false;
                             }
                 }
                         else
@@ -343,6 +366,8 @@ public class Player : MonoBehaviour {
                              if (platforms[i].GetComponent<BoxCollider2D>() == hits[1].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0)
                              {
                                  hitted[1] = true;
+                        Debug.Log("Maahan osui");
+                        break;
                              }
                              else
                              {
@@ -352,6 +377,8 @@ public class Player : MonoBehaviour {
                              if (platforms[i].GetComponent<BoxCollider2D>() == hits[2].collider && player.GetComponent<Rigidbody2D>().velocity.y < 0)
                              {
                                  hitted[2] = true;
+                        Debug.Log("Maahan osui");
+                        break;
                              }
                              else
                              {
