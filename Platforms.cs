@@ -11,12 +11,8 @@ public class Platforms : MonoBehaviour {
     float StartingPoint;
     public Camera maincam;
     GameObject[] chosenPlatforms;
-    int movingplatform = 0;
-    int movingplatform1 = 0;
-    int movingplatform2 = 0;
-    int movingplatform3 = 0;
-    int movingplatform4 = 0;
-    int movingplatform5 = 0;
+    
+    int[] movingplatforms;
     GameObject[] usedPlatform;
     Collider2D[] Collit;
     GameObject Spawner;
@@ -30,15 +26,36 @@ public class Platforms : MonoBehaviour {
     int time = 0;
     Camera Cam;
     bool ebin = false;
-    bool varattu = false;
+    bool[] varattu;
     bool PlatformNelja = false;
-    
-   
-    
+    public GameObject blockToGenerate; //Once ChooseLevelBlock() has been run, create this GameObject.
+    public GameObject lastBlock;// wonder why did they even listen. didn't ask for it.
+    public GameObject blockBeforeLast;
+    int rng;
+    float rng3;
+    public int middleBlockPriority;
+    public int transitionPriority;
+    public int gapPriority;
+    GameObject[] lowLeft;
+    GameObject[] lowMiddle;
+    GameObject[] lowRight;
+    GameObject lowToMid;
+    GameObject[] midLeft;
+    GameObject[] midMiddle;
+    GameObject[] midRight;
+    GameObject midToLow;
+    GameObject midToHigh;
+    GameObject[] highLeft;
+    GameObject[] highMiddle;
+    GameObject[] highRight;
+    GameObject highToMid;
+    GameObject highToLow;
+
+
     // Use this for initialization
     void Start ()
     {
-        
+        movingplatforms = new int[6];
         Spawner = new GameObject();
         Spawner.AddComponent<BoxCollider2D>();
         Spawner.AddComponent<Rigidbody2D>().isKinematic = true;
@@ -48,6 +65,21 @@ public class Platforms : MonoBehaviour {
         Spawner.GetComponent<BoxCollider2D>().isTrigger = true;
         Spawner.GetComponent<Rigidbody2D>().sleepMode.Equals(RigidbodySleepMode2D.NeverSleep);
 
+        lowLeft = new GameObject[2];
+        lowMiddle = new GameObject[2];
+        lowRight  = new GameObject[2];
+        midLeft   = new GameObject[2];
+        midMiddle = new GameObject[2];
+        midRight  = new GameObject[2];
+        highLeft  = new GameObject[2];
+        highMiddle= new GameObject[2];
+        highRight = new GameObject[2];
+
+        varattu = new bool[6];
+        for (int i = 0; i < varattu.Length; i++)
+        {
+            varattu[i] = false;
+        }
         ebin = true;
         iscolliding = false;
         Randoms = new int[4];
@@ -84,7 +116,10 @@ public class Platforms : MonoBehaviour {
         platforms[22] =Instantiate(alustat[22], alustat[22].transform.position, Quaternion.identity) as GameObject;
 
         
-
+        for(int i = 0; i < movingplatforms.Length; i++)
+        {
+            movingplatforms[i] = 0;
+        }
         for(int i = 0; i < platforms.Length; i++)
         {
             Debug.Log("Platform init");
@@ -290,349 +325,108 @@ public class Platforms : MonoBehaviour {
         platforms[21].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         platforms[22].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 
-        usedPlatform = new GameObject[platforms.Length];
-        usedPlatform[1] = platforms[2];
-        usedPlatform[2] = platforms[0];
-        usedPlatform[3] = platforms[4];
-        usedPlatform[4] = platforms[8];
-        usedPlatform[5] = platforms[9];
-        usedPlatform[6] = platforms[2];
-        usedPlatform[7] = platforms[0];
-        usedPlatform[8] = platforms[4];
-        usedPlatform[9] = platforms[8];
-        usedPlatform[10] = platforms[9];
-        usedPlatform[11] = platforms[2];
-        usedPlatform[12] = platforms[0];
-        usedPlatform[13] = platforms[4];
-        usedPlatform[14] = platforms[8];
-        usedPlatform[15] = platforms[4];
-        usedPlatform[16] = platforms[8];
-        usedPlatform[17] = platforms[9];
-        usedPlatform[18] = platforms[9];
-        usedPlatform[19] = platforms[1];
-        usedPlatform[20] = platforms[1];
-        usedPlatform[21] = platforms[1];
-        usedPlatform[22] = platforms[1];
+        lowLeft[0] =   platforms[2];
+        lowMiddle[0] = platforms[0];
+        lowRight[0]  = platforms[4];
+        lowLeft[1] =   platforms[3];
+        lowMiddle[1] = platforms[1];
+        lowRight[1] =  platforms[5];
+        lowToMid  =    platforms[7];
+        midLeft[0]   = platforms[10];
+        midMiddle[0] = platforms[8];
+        midRight[0]  = platforms[12];
+        midLeft[1] =   platforms[11];
+        midMiddle[1] = platforms[9];
+        midRight[1] =  platforms[13];
+        midToLow    =  platforms[6];
+        midToHigh =    platforms[15];
+        highLeft[0]  = platforms[18];
+        highMiddle[0] =platforms[16];
+        highRight[0] = platforms[20];
+        highLeft[1] =  platforms[19];
+        highMiddle[1]= platforms[17];
+        highRight[1] = platforms[21];
+        highToMid =    platforms[14];
+        highToLow =    platforms[22];
 
-       
-        usedPlatform[1] = Instantiate(platforms[2]);
-        usedPlatform[2] = Instantiate(platforms[0]);
-        usedPlatform[3] = Instantiate(platforms[4]);
+        usedPlatform = new GameObject[6];
+        usedPlatform[0] = null;
+        usedPlatform[1] = null;
+        usedPlatform[2] = null;
+        usedPlatform[3] = null;
+        usedPlatform[4] = null;
+        usedPlatform[5] = null;
+      
 
-        usedPlatform[1].GetComponent<BoxCollider2D>().enabled = true;
-        usedPlatform[2].GetComponent<BoxCollider2D>().enabled = true;
-        usedPlatform[3].GetComponent<BoxCollider2D>().enabled = true;
-        movingplatform = 1;
+        blockToGenerate = lowMiddle[Random.Range(0, 2)];
+        lastBlock = lowMiddle[Random.Range(0, 2)];
+        blockBeforeLast = lowMiddle[Random.Range(0, 2)];
+
+
+        usedPlatform[0] = Instantiate(blockToGenerate);
+
+        usedPlatform[0].GetComponent<BoxCollider2D>().enabled = true;
+
+        movingplatforms[0] = 1;
+        
         StartingPoint = platforms[0].transform.position.x;
     }
-    void instatePlatforms(int TheRand, int rand, int rand1, int rand2)
+    void instatePlatforms(GameObject TehPlatform) //, int rand, int rand1, int rand2)
     {
         Debug.Log("Ennen Spawnia päästiin.");
 
-        
-            int add = 0;
-            int add1 = 0;
-            int add2 = 0;
 
-
-            //  int[] addative = { 4, 5, 7, 8, 13, 14, 16, 17 };
-
-            if (TheRand == 1 && movingplatform == 0)
-            {
-
-
-
-                usedPlatform[1] = Instantiate(platforms[rand]);
-                usedPlatform[2] = Instantiate(platforms[rand1]);
-                usedPlatform[3] = Instantiate(platforms[rand2]);
-
-                usedPlatform[1].GetComponent<BoxCollider2D>().enabled = true;
-                usedPlatform[2].GetComponent<BoxCollider2D>().enabled = true;
-                usedPlatform[3].GetComponent<BoxCollider2D>().enabled = true;
-                movingplatform = 1;
-         
-            }
-        
-        /*else if (TheRand == 1 && movingplatform == 1)
-        {
-            TheRand++;
-        }*/
-        if (TheRand == 2 && movingplatform1 == 0)
-            {
-
-                if (rand == 2)
-                {
-                    add = 5;
-
-                }
-                if (rand == 3)
-                {
-                    add = 7;
-
-                }
-                if (rand1 == 0)
-                {
-                    add1 = 8;
-
-                }
-                if (rand1 == 1)
-                {
-                    add1 = 7;
-
-                }
-                if (rand2 == 4)
-                {
-                    add2 = 2;
-
-                }
-                if (rand2 == 5)
-                {
-                    add2 = 1;
-
-                }
-
-
-
-                usedPlatform[4] = Instantiate(platforms[rand + add]);
-                usedPlatform[5] = Instantiate(platforms[rand1 + add1]);
-                usedPlatform[6] = Instantiate(platforms[rand2 + add2]);
-
-                if (rand == 2)
-                {
-                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
-                    Boxes = usedPlatform[4].GetComponents<BoxCollider2D>();
-                    Boxes[0].enabled = true;
-                    Boxes[1].enabled = true;
-                PlatformNelja = false;
-                }
-                else if (rand == 3)
-                {
-                
-                    usedPlatform[4].GetComponent<BoxCollider2D>().enabled = true;
-                PlatformNelja = true;
-
-                 }
-
-                usedPlatform[5].GetComponent<BoxCollider2D>().enabled = true;
-
-                if (rand2 == 4 || rand2 == 5)
-                {
-                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
-                    Boxes = usedPlatform[6].GetComponents<BoxCollider2D>();
-                    Boxes[0].enabled = true;
-                    Boxes[1].enabled = true;
-                }
-
-
-                /*  usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x + 20, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
-                  usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x + 20, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
-                  usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x + 20, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);*/
-
-                movingplatform1 = 1;
-          
-        }
-        
-        /* else if (TheRand == 2 && movingplatform1 == 1)
-         {
-             TheRand++;
-         }*/
-        if (TheRand == 3 && movingplatform2 == 0)
-            {
-
-                if (rand == 2)
-                {
-                    add = 8;
-
-                }
-                if (rand == 3)
-                {
-                    add = 8;
-
-                }
-                if (rand1 == 0)
-                {
-                    add1 = 9;
-
-                }
-                if (rand1 == 1)
-                {
-                    add1 = 8;
-
-                }
-                if (rand2 == 4)
-                {
-                    add2 = 9;
-
-                }
-                if (rand2 == 5)
-                {
-                    add2 = 8;
-
-                }
-
-
-                usedPlatform[7] = Instantiate(platforms[rand + add]);
-                usedPlatform[8] = Instantiate(platforms[rand1 + add1]);
-                usedPlatform[9] = Instantiate(platforms[rand2 + add2]);
-
-                usedPlatform[7].GetComponent<BoxCollider2D>().enabled = true;
-                usedPlatform[8].GetComponent<BoxCollider2D>().enabled = true;
-                usedPlatform[9].GetComponent<BoxCollider2D>().enabled = true;
-                /*  usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x + 40, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
-                  usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x + 40, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
-                  usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x + 40, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);*/
-
-                movingplatform2 = 1;
-           
-        }
-        
-        /* else if (TheRand == 3 && movingplatform2 == 1)
-         {
-             TheRand++;
-         }*/
-        if (TheRand == 4 && movingplatform3 == 0 )
-            {
-
-                if (rand == 2)
-                {
-                    add = 13;
-
-                }
-                if (rand == 3)
-                {
-                    add = 12;
-
-                }
-                if (rand1 == 0)
-                {
-                    add1 = 16;
-
-                }
-                if (rand1 == 1)
-                {
-                    add1 = 15;
-
-                }
-                if (rand2 == 4)
-                {
-                    add2 = 16;
-
-                }
-                if (rand2 == 5)
-                {
-                    add2 = 17;
-
-                }
-
-                usedPlatform[10] = Instantiate(platforms[rand + add]);
-                usedPlatform[11] = Instantiate(platforms[rand1 + add1]);
-                usedPlatform[12] = Instantiate(platforms[rand2 + add2]);
-
-                if (rand == 2 || rand == 3)
-                {
-                    BoxCollider2D[] Boxes = new BoxCollider2D[2];
-                    Boxes = usedPlatform[10].GetComponents<BoxCollider2D>();
-                    Boxes[0].enabled = true;
-                    Boxes[1].enabled = true;
-                }
-
-                usedPlatform[11].GetComponent<BoxCollider2D>().enabled = true;
-            if (rand2 == 5)
-            {
-                BoxCollider2D[] Boxes = new BoxCollider2D[2];
-                Boxes = usedPlatform[12].GetComponents<BoxCollider2D>();
-                Boxes[0].enabled = true;
-                Boxes[1].enabled = true;
-            }
-            else if(rand2 == 4 )
-            {
-                usedPlatform[12].GetComponent<BoxCollider2D>().enabled = true;
-            }
-            
-
-                /*usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x + 60, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
-                usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x + 60, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
-                usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x + 60, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);*/
-
-                movingplatform3 = 1;
-            
-        }
        
-        /*else if (TheRand == 4 && movingplatform3 == 1)
-        {
-            TheRand = 1;
-        }*/
-        /* if (TheRand == 5)
-         {
-             if (rand == 2)
-             {
-                 add = 5;
-             }
-             if (rand == 3)
-             {
-                 add = 4;
-             }
-             if (rand1 == 0)
-             {
-                 add1 = 8;
-             }
-             if (rand1 == 1)
-             {
-                 add1 = 7;
-             }
-             if (rand2 == 4)
-             {
-                 add2 = 7;
-             }
-             if (rand2 == 5)
-             {
-                 add2 = 7;
-             }
-             usedPlatform[13] = platforms[rand];
-             usedPlatform[14] = platforms[rand1];
-             usedPlatform[15] = platforms[rand2];
-             chosenPlatforms = TheRand;
-             movingplatform4 = 1;
-         }
-         if (TheRand == 6)
-         {
-             if (rand == 2)
-             {
-                 add = 5;
-             }
-             if (rand == 3)
-             {
-                 add = 4;
-             }
-             if (rand1 == 0)
-             {
-                 add1 = 8;
-             }
-             if (rand1 == 1)
-             {
-                 add1 = 7;
-             }
-             if (rand2 == 4)
-             {
-                 add2 = 7;
-             }
-             if (rand2 == 5)
-             {
-                 add2 = 7;
-             }
-             usedPlatform[16] = platforms[rand];
-             usedPlatform[17] = platforms[rand1];
-             usedPlatform[18] = platforms[rand2];
-             chosenPlatforms = TheRand;
-             movingplatform5 = 1;
-         }*/
+        Debug.Log("Chosen next block");
 
-      
-        
-        
+       
+
+        for (int j = 0; j < movingplatforms.Length; j++)
+        {
+            if (movingplatforms[j] == 0)
+            {
+
+
+               
+                    if (usedPlatform[j] == null)
+                    {
+                        if (TehPlatform != null)
+                        {
+                            usedPlatform[j] = Instantiate(TehPlatform);
+                        }
+                        else
+                        {
+                            break;
+                        }
+
+                        if (usedPlatform[j] != null)
+                        {
+                            if (usedPlatform[j].GetComponents<BoxCollider2D>().Length > 1)
+                            {
+                                usedPlatform[j].GetComponents<BoxCollider2D>()[0].enabled = true;
+                                usedPlatform[j].GetComponents<BoxCollider2D>()[1].enabled = true;
+                            }
+                            else
+                            {
+                                usedPlatform[j].GetComponent<BoxCollider2D>().enabled = true;
+                            }
+                        }
+                    if (usedPlatform[j] != null)
+                    {
+                        movingplatforms[j] = 1;
+                    }
+                    break;
+                }
+                   
+                    
+                
+                
+                
+            }
+        }
+          
     }
-    // Update is called once per frame
-    
+    // Update is called once per frame 
     
     void Update()
     {
@@ -655,36 +449,54 @@ public class Platforms : MonoBehaviour {
     void CheckCollision()
     {
         bool check = true;
-        varattu = true;
+        
         for (int i = 0; i < usedPlatform.Length; i++)
         {
 
-            if (usedPlatform[i] != null && i < 13 && i != 0)
+            if (usedPlatform[i] == null)
             {
-                varattu = false;
+                varattu[i] = false;
+
             }
-            
-        if (varattu == true)
+            else
+            {
+                varattu[i] = true;
+                Debug.Log("Varattu true");
+            }
+        }
+        for (int i = 0; i < usedPlatform.Length; i++)
         {
-
-            if (usedPlatform[3] != null && usedPlatform[3].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
-                    usedPlatform[6] != null && usedPlatform[6].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
-                    usedPlatform[9] != null && usedPlatform[9].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()) ||
-                    usedPlatform[12] != null && usedPlatform[12].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()))
+            if (varattu[i] == true)
             {
+                if (usedPlatform[i].GetComponents<BoxCollider2D>().Length > 1)
+                {
+                    if (usedPlatform[i].GetComponents<BoxCollider2D>()[0].IsTouching(Spawner.GetComponent<BoxCollider2D>()) || usedPlatform[i].GetComponents<BoxCollider2D>()[1].IsTouching(Spawner.GetComponent<BoxCollider2D>()))
+                    {
+                        check = false;
+                        Debug.Log("Check False");
 
-                check = false;
+                    }
+                }
+                else if (usedPlatform[i].GetComponent<BoxCollider2D>().IsTouching(Spawner.GetComponent<BoxCollider2D>()))
+                {
 
+                    check = false;
+                    Debug.Log("Check False");
+                }
+                
             }
         }
-
-        }
+          
+        
         if (check)
         {
-            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
             check = false;
+            ChooseLevelBlock();
+            instatePlatforms(blockToGenerate);//, Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6);
+            
             
         }
+        
        /* bool Allmet = true;
         for (int s = 0; s < usedPlatform.Length; s++)
         {
@@ -699,14 +511,208 @@ public class Platforms : MonoBehaviour {
         if (Allmet)
         {
             Debug.Log("ALLMet");
-            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6));
+            instatePlatforms(Random.Range(1, 5), Random.Range(2, 4), Random.Range(0, 2), Random.Range(4, 6);
         }
 
         */
     }
-       
-  
-  
+    public void ChooseLevelBlock()
+    {
+
+        if (lastBlock == lowRight[0] || lastBlock == midRight[0] || lastBlock == highRight[0] || lastBlock == lowRight[1] || lastBlock == midRight[1] || lastBlock == highRight[1])  //If it's a right corner block, the next block is a gap.
+        {
+            blockBeforeLast = lastBlock;
+            lastBlock = blockToGenerate;
+            blockToGenerate = null;
+            Debug.Log("Gap");
+           
+        }
+        else if (lastBlock == lowLeft[0] || lastBlock == lowMiddle[0] || lastBlock == lowLeft[1] || lastBlock == lowMiddle[1] || lastBlock == midToLow || lastBlock == highToLow)
+        {
+            lastBlock = blockToGenerate;
+            float rng2 = (float)Random.Range(0f, middleBlockPriority) / 2;
+            if (rng2 <= 0.5f)
+            {
+
+                rng3 = Random.Range(0f, (float)transitionPriority);
+                if (rng3 <= 0.5f)
+                {
+                    blockToGenerate = lowRight[Random.Range(0, 2)];
+                    Debug.Log("Low Right");
+                }
+                else
+                {
+                    blockToGenerate = lowToMid;
+                    Debug.Log("Low to Mid");
+                }
+            }
+            else
+            {
+                blockToGenerate = lowMiddle[Random.Range(0, 2)];
+                Debug.Log("Low Middle");
+            }
+           // blockBeforeLast = lastBlock;
+           
+        }
+        else if (lastBlock == midLeft[0] || lastBlock == midMiddle[0] || lastBlock == midLeft[1] || lastBlock == midMiddle[1] || lastBlock == lowToMid || lastBlock == highToMid)
+        {
+            lastBlock = blockToGenerate;
+            float rng2 = (float)Random.Range(0f, middleBlockPriority) / 2;
+            if (rng2 <= 0.5f)
+            {
+
+                rng = Random.Range(0, 3);
+                if (rng == 0)
+                {
+                    blockToGenerate = midRight[Random.Range(0, 2)];
+                    Debug.Log("Mid Right");
+                }
+                else if (rng == 1)
+                {
+                    blockToGenerate = midToLow;
+                    Debug.Log("Mid to Low");
+                }
+                else
+                {
+                    blockToGenerate = midToHigh;
+                    Debug.Log("Mid to High");
+                }
+            }
+            else
+            {
+                blockToGenerate = midMiddle[Random.Range(0, 2)];
+                Debug.Log("Mid Middle");
+            }
+           // blockBeforeLast = lastBlock;
+           
+        }
+        else if (lastBlock == highLeft[0] || lastBlock == highMiddle[0] || lastBlock == highLeft[1] || lastBlock == highMiddle[1] || lastBlock == midToHigh)
+        {
+            lastBlock = blockToGenerate;
+            float rng2 = (float)Random.Range(0f, middleBlockPriority) / 2;
+            if (rng2 <= 0.5f)
+            {
+
+                rng = Random.Range(0, 3);
+                if (rng == 0)
+                {
+                    blockToGenerate = highRight[Random.Range(0, 2)];
+                    Debug.Log("High Right");
+                }
+                else if (rng == 1)
+                {
+                    blockToGenerate = highToMid;
+                    Debug.Log("High to Mid");
+                }
+                else
+                {
+                    blockToGenerate = highToLow;
+                    Debug.Log("High to Low");
+                }
+            }
+            else
+            {
+                blockToGenerate = highMiddle[Random.Range(0, 2)];
+                Debug.Log("High Middle");
+            }
+           // blockBeforeLast = lastBlock;
+            
+        }
+        else if (lastBlock == null) //What happens if the last piece was a gap // you fall... :D 
+        {
+            if (blockBeforeLast == lowRight[0] || blockBeforeLast == lowRight[1])
+            {
+                lastBlock = blockToGenerate;
+                blockToGenerate = lowLeft[Random.Range(0, 2)];
+                Debug.Log("Low Left");
+               // blockBeforeLast = lastBlock;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                
+            }
+            else if (blockBeforeLast == midRight[0] || blockBeforeLast == midRight[1])
+            {
+                lastBlock = blockToGenerate;
+                rng = Random.Range(0, 2);
+                if (rng == 0)
+                {
+                    blockToGenerate = midLeft[Random.Range(0, 2)];
+                    Debug.Log("Mid Left");
+                }
+                else
+                {
+                    blockToGenerate = lowLeft[Random.Range(0, 2)];
+                    Debug.Log("Low Left;");
+                }
+                // blockBeforeLast = lastBlock;
+               
+            }
+            else if (blockBeforeLast == highRight[0] || blockBeforeLast == highRight[1])
+            {
+                
+                rng = Random.Range(0, 3);
+                if (rng == 0)
+                {
+                    blockToGenerate = highLeft[Random.Range(0, 2)];
+                    Debug.Log("High Left");
+                }
+                else if (rng == 1)
+                {
+                    blockToGenerate = midLeft[Random.Range(0, 2)];
+                    Debug.Log("Mid Left");
+                }
+                else
+                {
+                    blockToGenerate = lowLeft[Random.Range(0, 2)];
+                    Debug.Log("Low Left;");
+                }
+                lastBlock = blockToGenerate;
+                // blockBeforeLast = lastBlock;
+
+            }
+            else if(blockBeforeLast == null)
+            {
+                lastBlock = blockToGenerate;
+                rng = Random.Range(0, 6);
+                {
+                    if (rng == 0)
+                    {
+                        blockToGenerate = lowLeft[Random.Range(0, 2)];
+                        Debug.Log("Low Left");
+                        // blockBeforeLast = lastBlock;
+                    }
+                    else if (rng == 1)
+                    {
+                        blockToGenerate = midLeft[Random.Range(0, 2)];
+                        Debug.Log("Mid Left");
+                    }
+                    else if (rng == 2)
+                    {
+                        blockToGenerate = lowLeft[Random.Range(0, 2)];
+                        Debug.Log("Low Left;");
+                    }
+                    // blockBeforeLast = lastBlock;
+                    else if (rng == 3)
+                    {
+                        blockToGenerate = highLeft[Random.Range(0, 2)];
+                        Debug.Log("High Left");
+                    }
+                    else if (rng == 4)                       
+                    {
+                        blockToGenerate = midLeft[Random.Range(0, 2)];
+                        Debug.Log("Mid Left");
+                    }
+                    else
+                    {
+                        blockToGenerate = lowLeft[Random.Range(0, 2)];
+                        Debug.Log("Low Left;");
+                    }
+                }
+            }
+        }
+
+    }
+
+
+
     void movePlatforms()
     {
         /*
@@ -734,146 +740,147 @@ public class Platforms : MonoBehaviour {
         platforms[21].transform.position = new Vector3(platforms[21].transform.position.x - moveSpeed, platforms[21].transform.position.y, platforms[21].transform.position.z);
         platforms[22].transform.position = new Vector3(platforms[22].transform.position.x - moveSpeed, platforms[22].transform.position.y, platforms[22].transform.position.z);
         */
-        if (movingplatform == 1)
+        for (int i = 0; i < movingplatforms.Length; i++)
         {
-            usedPlatform[1].transform.position = new Vector3(usedPlatform[1].transform.position.x - moveSpeed, usedPlatform[1].transform.position.y, usedPlatform[1].transform.position.z);
-            usedPlatform[2].transform.position = new Vector3(usedPlatform[2].transform.position.x - moveSpeed, usedPlatform[2].transform.position.y, usedPlatform[2].transform.position.z);
-            usedPlatform[3].transform.position = new Vector3(usedPlatform[3].transform.position.x - moveSpeed, usedPlatform[3].transform.position.y, usedPlatform[3].transform.position.z);
-            /* for (int i = 1; i < 4; i++)
-             {
-                 if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+            if (movingplatforms[i] == 1)
+            {
+                usedPlatform[i].transform.position = new Vector3(usedPlatform[i].transform.position.x - moveSpeed, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                /* for (int i = 1; i < 4; i++)
                  {
-                     Debug.Log("Tänne päästiin");
-                     //usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                     Destroy(usedPlatform[i]);
+                     if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                     {
+                         Debug.Log("Tänne päästiin");
+                         //usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                         Destroy(usedPlatform[i]);
 
-                 }*/
-            if (usedPlatform[3].transform.position.x + 2.5 < Cam.transform.position.x - 10)
-            {
-                
-                Destroy(usedPlatform[1].gameObject);
-                Destroy(usedPlatform[2].gameObject);
-                Destroy(usedPlatform[3].gameObject);
-                movingplatform = 0;
-            }
-        //}
-
-
-        }
-        if ( movingplatform1 == 1)
-        {
-            usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x - moveSpeed, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
-            usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x - moveSpeed, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
-            usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x - moveSpeed, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);
-          /*  for (int i = 4; i < 7; i++)
-            {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                     }*/
+                if (usedPlatform[i].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    Destroy(usedPlatform[i]);
-                }*/
+
+                    Destroy(usedPlatform[i].gameObject);
+                    usedPlatform[i] = null;
+
+                    movingplatforms[i] = 0;
+                }
+                //}
+
+
+            }
+        }
+        /*
+            if (movingplatform1 == 1)
+            {
+                usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x - moveSpeed, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
+                usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x - moveSpeed, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
+                usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x - moveSpeed, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);
+                /*  for (int i = 4; i < 7; i++)
+                  {
+                      if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                      {
+                          // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                          Destroy(usedPlatform[i]);
+                      }
                 if (usedPlatform[6].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                
 
-                Destroy(usedPlatform[4]);
-                PlatformNelja = false;
+
+                    Destroy(usedPlatform[4]);
+                    PlatformNelja = false;
                     Destroy(usedPlatform[5]);
                     Destroy(usedPlatform[6]);
                     Debug.Log("Moving Platform päästiin.");
                     movingplatform1 = 0;
                 }
-            //}
-        }
-        if ( movingplatform2 == 1)
-        {
-            usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x - moveSpeed, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
-            usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x - moveSpeed, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
-            usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x - moveSpeed, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);
-           /* for (int i = 7; i < 10; i++)
+                //}
+            }
+            if (movingplatform2 == 1)
             {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
-                {
-                    //  usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    Destroy(usedPlatform[i]);
-                }*/
+                usedPlatform[7].transform.position = new Vector3(usedPlatform[7].transform.position.x - moveSpeed, usedPlatform[7].transform.position.y, usedPlatform[7].transform.position.z);
+                usedPlatform[8].transform.position = new Vector3(usedPlatform[8].transform.position.x - moveSpeed, usedPlatform[8].transform.position.y, usedPlatform[8].transform.position.z);
+                usedPlatform[9].transform.position = new Vector3(usedPlatform[9].transform.position.x - moveSpeed, usedPlatform[9].transform.position.y, usedPlatform[9].transform.position.z);
+                /* for (int i = 7; i < 10; i++)
+                 {
+                     if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                     {
+                         //  usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                         Destroy(usedPlatform[i]);
+                     }
                 if (usedPlatform[9].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                
-                Destroy(usedPlatform[7].gameObject);
+
+                    Destroy(usedPlatform[7].gameObject);
                     Destroy(usedPlatform[8].gameObject);
                     Destroy(usedPlatform[9].gameObject);
                     movingplatform2 = 0;
                 }
-            //}
-        }
-        if ( movingplatform3 == 1)
-        {
-            usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x - moveSpeed, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
-            usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x - moveSpeed, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
-            usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x - moveSpeed, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);
-           /* for (int i = 10; i < 13; i++)
+                //}
+            }
+            if (movingplatform3 == 1)
             {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
-                {
-                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    Destroy(usedPlatform[i]);
-                }*/
+                usedPlatform[10].transform.position = new Vector3(usedPlatform[10].transform.position.x - moveSpeed, usedPlatform[10].transform.position.y, usedPlatform[10].transform.position.z);
+                usedPlatform[11].transform.position = new Vector3(usedPlatform[11].transform.position.x - moveSpeed, usedPlatform[11].transform.position.y, usedPlatform[11].transform.position.z);
+                usedPlatform[12].transform.position = new Vector3(usedPlatform[12].transform.position.x - moveSpeed, usedPlatform[12].transform.position.y, usedPlatform[12].transform.position.z);
+                /* for (int i = 10; i < 13; i++)
+                 {
+                     if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                     {
+                         // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                         Destroy(usedPlatform[i]);
+                     }
                 if (usedPlatform[12].transform.position.x + 2.5 < Cam.transform.position.x - 10)
                 {
-                
-                Destroy(usedPlatform[10].gameObject);
+
+                    Destroy(usedPlatform[10].gameObject);
                     Destroy(usedPlatform[11].gameObject);
                     Destroy(usedPlatform[12].gameObject);
                     movingplatform3 = 0;
                 }
-            //}
-        }
-        if ( movingplatform4 ==1)
-        {
-            usedPlatform[13].transform.position = new Vector3(usedPlatform[13].transform.position.x - moveSpeed, usedPlatform[13].transform.position.y, usedPlatform[13].transform.position.z);
-            usedPlatform[14].transform.position = new Vector3(usedPlatform[14].transform.position.x - moveSpeed, usedPlatform[14].transform.position.y, usedPlatform[14].transform.position.z);
-            usedPlatform[15].transform.position = new Vector3(usedPlatform[15].transform.position.x - moveSpeed, usedPlatform[15].transform.position.y, usedPlatform[15].transform.position.z);
-            /*for (int i = 13; i < 16; i++)
+                //}
+            }
+            if (movingplatform4 == 1)
             {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                usedPlatform[13].transform.position = new Vector3(usedPlatform[13].transform.position.x - moveSpeed, usedPlatform[13].transform.position.y, usedPlatform[13].transform.position.z);
+                usedPlatform[14].transform.position = new Vector3(usedPlatform[14].transform.position.x - moveSpeed, usedPlatform[14].transform.position.y, usedPlatform[14].transform.position.z);
+                usedPlatform[15].transform.position = new Vector3(usedPlatform[15].transform.position.x - moveSpeed, usedPlatform[15].transform.position.y, usedPlatform[15].transform.position.z);
+                /*for (int i = 13; i < 16; i++)
                 {
-                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    Destroy(usedPlatform[i]);
-                }*/
-            if (usedPlatform[15].transform.position.x + 2.5 < Cam.transform.position.x - 10)
-            {
-                Destroy(usedPlatform[13].gameObject);
-                Destroy(usedPlatform[14].gameObject);
-                Destroy(usedPlatform[15].gameObject);
-                movingplatform4 = 0;
+                    if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                    {
+                        // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                        Destroy(usedPlatform[i]);
+                    }
+                if (usedPlatform[15].transform.position.x + 2.5 < Cam.transform.position.x - 10)
+                {
+                    Destroy(usedPlatform[13].gameObject);
+                    Destroy(usedPlatform[14].gameObject);
+                    Destroy(usedPlatform[15].gameObject);
+                    movingplatform4 = 0;
                 }
 
-            //}
-        }
-        if ( movingplatform5 ==1)
-        {
-            usedPlatform[16].transform.position = new Vector3(usedPlatform[16].transform.position.x - moveSpeed, usedPlatform[16].transform.position.y, usedPlatform[16].transform.position.z);
-            usedPlatform[17].transform.position = new Vector3(usedPlatform[17].transform.position.x - moveSpeed, usedPlatform[17].transform.position.y, usedPlatform[17].transform.position.z);
-            usedPlatform[18].transform.position = new Vector3(usedPlatform[18].transform.position.x - moveSpeed, usedPlatform[18].transform.position.y, usedPlatform[18].transform.position.z);
-            /*for (int i = 16; i < 19; i++)
-            {
-                if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
-                {
-                    // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
-                    Destroy(usedPlatform[i]);
-                }*/
-            if (usedPlatform[18].transform.position.x + 2.5 < Cam.transform.position.x - 10)
-            {
-                Destroy(usedPlatform[16].gameObject);
-                Destroy(usedPlatform[17].gameObject);
-                Destroy(usedPlatform[18].gameObject);
-                
-                movingplatform5 = 0;
-                
+                //}
             }
-        }
+            if (movingplatform5 == 1)
+            {
+                usedPlatform[16].transform.position = new Vector3(usedPlatform[16].transform.position.x - moveSpeed, usedPlatform[16].transform.position.y, usedPlatform[16].transform.position.z);
+                usedPlatform[17].transform.position = new Vector3(usedPlatform[17].transform.position.x - moveSpeed, usedPlatform[17].transform.position.y, usedPlatform[17].transform.position.z);
+                usedPlatform[18].transform.position = new Vector3(usedPlatform[18].transform.position.x - moveSpeed, usedPlatform[18].transform.position.y, usedPlatform[18].transform.position.z);
+                /*for (int i = 16; i < 19; i++)
+                {
+                    if (usedPlatform[i].transform.position.x + 15 < Cam.rect.xMin)
+                    {
+                        // usedPlatform[i].transform.position = new Vector3(StartingPoint, usedPlatform[i].transform.position.y, usedPlatform[i].transform.position.z);
+                        Destroy(usedPlatform[i]);
+                    }
+                if (usedPlatform[18].transform.position.x + 2.5 < Cam.transform.position.x - 10)
+                {
+                    Destroy(usedPlatform[16].gameObject);
+                    Destroy(usedPlatform[17].gameObject);
+                    Destroy(usedPlatform[18].gameObject);
 
+                    movingplatform5 = 0;
+                    }
+            }
+        }*/
       
 
     }
@@ -891,6 +898,8 @@ public class Platforms : MonoBehaviour {
     }*/
     public GameObject[] getPlatforms(bool whole)
     {
+        return usedPlatform;
+        /*
         GameObject[] fstplatform = new GameObject[3];
         GameObject[] sstplatform = new GameObject[3];
         GameObject[] tstplatform = new GameObject[3];
@@ -944,7 +953,8 @@ public class Platforms : MonoBehaviour {
             return fostplatform;
 
         }
-        return null;
+        */
+       
     }
 
 
