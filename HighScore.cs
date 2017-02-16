@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+        //Feel free to completely ignore this script, it has no use.
 public class HighScore : MonoBehaviour {
 
     int Score;

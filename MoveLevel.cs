@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections;
-
+    //Feel free to rewrite this. Just scroll down and witness the glory...
 public class MoveLevel : MonoBehaviour {
 
     public int timeLimit;

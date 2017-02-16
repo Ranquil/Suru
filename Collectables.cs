@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+    //Just rewrite this. I have no idea why small collectables need code that's this weird.
 public class Collectables : MonoBehaviour {
 
     public GameObject Collectable;

@@ -4,14 +4,14 @@ using System.Collections;
 public class Platforms : MonoBehaviour {
 
 
-    public GameObject[] alustat;
-    GameObject[] platforms;
+    public GameObject[] alustat;    //"Alusta" means "platform", the -t makes it plural.
+    GameObject[] platforms;         //I told you, the code is a bit convoluded. xd
     //GameObject Spawner;
     public float moveSpeed;
     float StartingPoint;
-    public Camera maincam;
-    GameObject[] chosenPlatforms;
-    
+    public Camera maincam;              //I literally have no idea what each of these variables do here.
+    GameObject[] chosenPlatforms;       //Feel free to rewrite anything that uses these.
+                                        //Well, except for the stuff I explicitly say should be left as is. :D That stuff is understandable in 
     int[] movingplatforms;
     GameObject[] usedPlatform;
     Collider2D[] Collit;
@@ -26,18 +26,18 @@ public class Platforms : MonoBehaviour {
     int time = 0;
     Camera Cam;
     bool ebin = false;
-    bool[] varattu;
-    bool PlatformNelja = false;
-    public GameObject blockToGenerate; //Once ChooseLevelBlock() has been run, create this GameObject.
-    public GameObject lastBlock;// wonder why did they even listen. didn't ask for it.
-    public GameObject blockBeforeLast;
+    bool[] varattu;     //Varattu = taken, reserved.  I have no idea what this does.
+    bool PlatformNelja = false;     //"Neljä" means 4. ._.
+    public GameObject blockToGenerate; //THESE! Please keep all variables below this! They're actually reusable!
+    public GameObject lastBlock;
+    public GameObject blockBeforeLast;  //Okay, this one here may or may not be useful, idk.
     int rng;
-    float rng3;
+    float rng3; //Lol, this happened because there's a "rng2" in the function that uses these.
     public int middleBlockPriority;
     public int transitionPriority;
     public int gapPriority;
-    GameObject[] lowLeft;
-    GameObject[] lowMiddle;
+    GameObject[] lowLeft;       //Just make these public so one can just drag level block prefabs to these.
+    GameObject[] lowMiddle;     //The ones that are arrays have 2 variations, and when generated, the game randomly chooses one of them.
     GameObject[] lowRight;
     GameObject lowToMid;
     GameObject[] midLeft;
@@ -57,7 +57,7 @@ public class Platforms : MonoBehaviour {
     {
         movingplatforms = new int[6];
         Spawner = new GameObject();
-        Spawner.AddComponent<BoxCollider2D>();
+        Spawner.AddComponent<BoxCollider2D>();              //Yes, let's construct simple GameObjects along with their positions and colliders in code, that's a wonderful idea!
         Spawner.AddComponent<Rigidbody2D>().isKinematic = true;
         Spawner.transform.position = new Vector3(20, 0, 0);
         Spawner.GetComponent<BoxCollider2D>().size = new Vector2(20, 20);
@@ -91,23 +91,23 @@ public class Platforms : MonoBehaviour {
         Cam = maincam.GetComponent<Camera>();
         
         platforms = new GameObject[alustat.Length];
-        platforms[0] = Instantiate(alustat[0] , alustat[0].transform.position, Quaternion.identity) as GameObject;
-        platforms[1] = Instantiate(alustat[1] , alustat[1].transform.position, Quaternion.identity) as GameObject;
-        platforms[2] = Instantiate(alustat[2] , alustat[2].transform.position, Quaternion.identity) as GameObject;
+        platforms[0] = Instantiate(alustat[0] , alustat[0].transform.position, Quaternion.identity) as GameObject;      //Yes, setting up a bunch of level blocks that should be generated in the
+        platforms[1] = Instantiate(alustat[1] , alustat[1].transform.position, Quaternion.identity) as GameObject;      //game should obviously be constructed completely in code instead of being
+        platforms[2] = Instantiate(alustat[2] , alustat[2].transform.position, Quaternion.identity) as GameObject;      //made as prefabs and put into the script via public GameObjects. 
         platforms[3] = Instantiate(alustat[3] , alustat[3].transform.position, Quaternion.identity) as GameObject;
-        platforms[4] = Instantiate(alustat[4] , alustat[4].transform.position, Quaternion.identity) as GameObject;
-        platforms[5] = Instantiate(alustat[5] , alustat[5].transform.position, Quaternion.identity) as GameObject;
-        platforms[6] = Instantiate(alustat[6] , alustat[6].transform.position, Quaternion.identity) as GameObject;
-        platforms[7] = Instantiate(alustat[7] , alustat[7].transform.position, Quaternion.identity) as GameObject;
+        platforms[4] = Instantiate(alustat[4] , alustat[4].transform.position, Quaternion.identity) as GameObject;      //After all, it's obviously better to generate all the possible level blocks
+        platforms[5] = Instantiate(alustat[5] , alustat[5].transform.position, Quaternion.identity) as GameObject;      //all at once when the level is instantiated and then stoaring them in
+        platforms[6] = Instantiate(alustat[6] , alustat[6].transform.position, Quaternion.identity) as GameObject;      //completely separate GameObject variables. Instead of just making them
+        platforms[7] = Instantiate(alustat[7] , alustat[7].transform.position, Quaternion.identity) as GameObject;      //as prefabs and calling them whenever needed.
         platforms[8] = Instantiate(alustat[8] , alustat[8].transform.position, Quaternion.identity) as GameObject;
-        platforms[9] = Instantiate(alustat[9] , alustat[9].transform.position, Quaternion.identity) as GameObject;
+        platforms[9] = Instantiate(alustat[9] , alustat[9].transform.position, Quaternion.identity) as GameObject;      //Obviously.
         platforms[10] =Instantiate(alustat[10], alustat[10].transform.position, Quaternion.identity) as GameObject;
         platforms[11] =Instantiate(alustat[11], alustat[11].transform.position, Quaternion.identity) as GameObject;
         platforms[12] =Instantiate(alustat[12], alustat[12].transform.position, Quaternion.identity) as GameObject;
         platforms[13] =Instantiate(alustat[13], alustat[13].transform.position, Quaternion.identity) as GameObject;
         platforms[14] =Instantiate(alustat[14], alustat[14].transform.position, Quaternion.identity) as GameObject;
         platforms[15] =Instantiate(alustat[15], alustat[15].transform.position, Quaternion.identity) as GameObject;
-        platforms[16] =Instantiate(alustat[16], alustat[16].transform.position, Quaternion.identity) as GameObject;
+        platforms[16] =Instantiate(alustat[16], alustat[16].transform.position, Quaternion.identity) as GameObject;     //Please kill me.
         platforms[17] =Instantiate(alustat[17], alustat[17].transform.position, Quaternion.identity) as GameObject;
         platforms[18] =Instantiate(alustat[18], alustat[18].transform.position, Quaternion.identity) as GameObject;
         platforms[19] =Instantiate(alustat[19], alustat[19].transform.position, Quaternion.identity) as GameObject;
@@ -120,7 +120,7 @@ public class Platforms : MonoBehaviour {
         {
             movingplatforms[i] = 0;
         }
-        for(int i = 0; i < platforms.Length; i++)
+        for(int i = 0; i < platforms.Length; i++)       //Yes, this too is done in code. ;___;
         {
             Debug.Log("Platform init");
 
@@ -302,7 +302,7 @@ public class Platforms : MonoBehaviour {
             Collit[i].enabled = false;
         }
         platforms[0].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        platforms[1].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        platforms[1].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);          //Hhhhnnngggh
         platforms[2].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         platforms[3].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         platforms[4].transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -328,7 +328,7 @@ public class Platforms : MonoBehaviour {
         lowLeft[0] =   platforms[2];
         lowMiddle[0] = platforms[0];
         lowRight[0]  = platforms[4];
-        lowLeft[1] =   platforms[3];
+        lowLeft[1] =   platforms[3];        //Please, make it stop. ;___;
         lowMiddle[1] = platforms[1];
         lowRight[1] =  platforms[5];
         lowToMid  =    platforms[7];
@@ -373,7 +373,7 @@ public class Platforms : MonoBehaviour {
     }
     void instatePlatforms(GameObject TehPlatform) //, int rand, int rand1, int rand2)
     {
-        Debug.Log("Ennen Spawnia päästiin.");
+        Debug.Log("Ennen Spawnia päästiin.");   //"Made it before Spawn" or something like that. The grammar is a bit weird so even I don't fully get what this means.
 
 
        
@@ -516,7 +516,7 @@ public class Platforms : MonoBehaviour {
 
         */
     }
-    public void ChooseLevelBlock()
+    public void ChooseLevelBlock()      //THIS VOID RIGHT HERE!! Please use it! It's an algorithm for selecting which level block to generate next. Just use the variables I said were reusable and then call this function.
     {
 
         if (lastBlock == lowRight[0] || lastBlock == midRight[0] || lastBlock == highRight[0] || lastBlock == lowRight[1] || lastBlock == midRight[1] || lastBlock == highRight[1])  //If it's a right corner block, the next block is a gap.
@@ -550,7 +550,7 @@ public class Platforms : MonoBehaviour {
             {
                 blockToGenerate = lowMiddle[Random.Range(0, 2)];
                 Debug.Log("Low Middle");
-            }
+            }       //Turns out that we don't need the blockBeforeLast variable atm. We might in the future though if the gaps can get a bit longer.
            // blockBeforeLast = lastBlock;
            
         }
@@ -716,8 +716,8 @@ public class Platforms : MonoBehaviour {
     void movePlatforms()
     {
         /*
-        platforms[0].transform.position = new Vector3(platforms[0].transform.position.x - moveSpeed, platforms[0].transform.position.y, platforms[0].transform.position.z);
-        platforms[1].transform.position = new Vector3(platforms[1].transform.position.x - moveSpeed, platforms[1].transform.position.y, platforms[1].transform.position.z);
+        platforms[0].transform.position = new Vector3(platforms[0].transform.position.x - moveSpeed, platforms[0].transform.position.y, platforms[0].transform.position.z);     Lotsa commented code, yay.
+        platforms[1].transform.position = new Vector3(platforms[1].transform.position.x - moveSpeed, platforms[1].transform.position.y, platforms[1].transform.position.z);     This shit was a thing at one point.
         platforms[2].transform.position = new Vector3(platforms[2].transform.position.x - moveSpeed, platforms[2].transform.position.y, platforms[2].transform.position.z);
         platforms[3].transform.position = new Vector3(platforms[3].transform.position.x - moveSpeed, platforms[3].transform.position.y, platforms[3].transform.position.z);
         platforms[4].transform.position = new Vector3(platforms[4].transform.position.x - moveSpeed, platforms[4].transform.position.y, platforms[4].transform.position.z);
@@ -770,7 +770,7 @@ public class Platforms : MonoBehaviour {
         /*
             if (movingplatform1 == 1)
             {
-                usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x - moveSpeed, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);
+                usedPlatform[4].transform.position = new Vector3(usedPlatform[4].transform.position.x - moveSpeed, usedPlatform[4].transform.position.y, usedPlatform[4].transform.position.z);     Even more commented code, yaaaay...
                 usedPlatform[5].transform.position = new Vector3(usedPlatform[5].transform.position.x - moveSpeed, usedPlatform[5].transform.position.y, usedPlatform[5].transform.position.z);
                 usedPlatform[6].transform.position = new Vector3(usedPlatform[6].transform.position.x - moveSpeed, usedPlatform[6].transform.position.y, usedPlatform[6].transform.position.z);
                 /*  for (int i = 4; i < 7; i++)
@@ -839,7 +839,7 @@ public class Platforms : MonoBehaviour {
             }
             if (movingplatform4 == 1)
             {
-                usedPlatform[13].transform.position = new Vector3(usedPlatform[13].transform.position.x - moveSpeed, usedPlatform[13].transform.position.y, usedPlatform[13].transform.position.z);
+                usedPlatform[13].transform.position = new Vector3(usedPlatform[13].transform.position.x - moveSpeed, usedPlatform[13].transform.position.y, usedPlatform[13].transform.position.z);    ...it's still going...
                 usedPlatform[14].transform.position = new Vector3(usedPlatform[14].transform.position.x - moveSpeed, usedPlatform[14].transform.position.y, usedPlatform[14].transform.position.z);
                 usedPlatform[15].transform.position = new Vector3(usedPlatform[15].transform.position.x - moveSpeed, usedPlatform[15].transform.position.y, usedPlatform[15].transform.position.z);
                 /*for (int i = 13; i < 16; i++)
@@ -877,7 +877,7 @@ public class Platforms : MonoBehaviour {
                     Destroy(usedPlatform[17].gameObject);
                     Destroy(usedPlatform[18].gameObject);
 
-                    movingplatform5 = 0;
+                    movingplatform5 = 0;                                              ._.
                     }
             }
         }*/
@@ -945,7 +945,7 @@ public class Platforms : MonoBehaviour {
             return tstplatform;
         }
 
-        if (usedPlatform[10] != null && usedPlatform[11] != null && usedPlatform[12] != null)
+        if (usedPlatform[10] != null && usedPlatform[11] != null && usedPlatform[12] != null)                                                      .____________________.
         {
             fostplatform[0] = usedPlatform[10];
             fostplatform[1] = usedPlatform[11];

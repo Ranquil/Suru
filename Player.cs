@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+        //This script works and it's readable! It's made by another programmer though. ":D" However, you can rewrite it if you want to.
 public class Player : MonoBehaviour {
 
     public GameObject player;
@@ -17,7 +17,7 @@ public class Player : MonoBehaviour {
         //colli = player.GetComponent<BoxCollider2D>();
         collisioner = player.transform.Find("Collider").gameObject;
         if (collisioner != null) Debug.Log("We found the collider, Sir!");
-        else Debug.LogError("We ain't found jack shit, Sir!");
+        else Debug.LogError("We haven't found jack shit, Sir!");
         col = collisioner.GetComponent<BoxCollider2D>();
         player.GetComponent<Rigidbody2D>().freezeRotation = true;
         falling = true;

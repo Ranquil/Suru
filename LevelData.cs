@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public enum level_id
+﻿using UnityEngine;                          //IGNORE THIS SCRIPT!
+using System.Collections;                   //THE STUFF HERE WAS USEFULL,
+                                            //BUT IT'S MOVED TO THE PLATFORMS
+public enum level_id                        //SCRIPT AND THEN IT GOT FIXED!
 {
     FOR_OF_MEET_MORNING, FOR_OF_MEET_EVENING,
     LAKE_OF_STILL_NIGHT, LAKE_OF_STILL_DAY, LAKE_OF_STILL_UNDERWATER,
